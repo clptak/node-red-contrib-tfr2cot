@@ -1,12 +1,8 @@
 # node-red-contrib-tfr2cot
 Requests TFR List for a given state from https://tfr.faa.gov/ and creates cursor-on-target (CoT) polygon messages sent to a Team Awareness Kit (TAK) Server or network
 
-**ATAK Screenshots**
 <img src="docs/atak_tfr_Screenshot_01.png" width="600"/>
 <img src="docs/atak_tfr_Screenshot_02.png" width="600"/>
-
-**FAA Website from url in `Associated Link` field in the TFR / CoT information menu:**
-<img src="docs/faa_tfr_link_from_ATAK.png" width="600"/>
 
 ## SUMMARY
 
