@@ -1,0 +1,114 @@
+{
+    "_attributes": {
+        "version": "2.0",
+        "uid": "10c46aff-3007-439a-9ee1-fc5ca256395b",
+        "type": "u-d-f",
+        "how": "h-e",
+        "time": "2023-08-15T12:30:54.010Z",
+        "start": "2023-08-15T12:30:54.010Z",
+        "stale": "2023-08-15T12:50:54.010Z"
+    },
+    "point": {
+        "_attributes": {
+            "lat": "39.13416667",
+            "lon": "-121.4375",
+            "hae": "9999999.0",
+            "ce": "9999999.0",
+            "le": "9999999.0"
+        }
+    },
+    "detail": {
+        "strokeColor": [
+            {
+                "_attributes": {
+                    "value": "-65536"
+                }
+            }
+        ],
+        "strokeWeight": [
+            {
+                "_attributes": {
+                    "value": "1.0"
+                }
+            }
+        ],
+        "fillColor": [
+            {
+                "_attributes": {}
+            }
+        ],
+        "contact": [
+            {
+                "_attributes": {
+                    "callsign": "tfr-3-3868"
+                }
+            }
+        ],
+        "remarks": "DESCRIPTION FOR THE TFR",
+        "archive": "",
+        "labels_on": [
+            {
+                "_attributes": {
+                    "value": "true"
+                }
+            }
+        ],
+        "precisionlocation": [
+            {
+                "_attributes": {
+                    "altsrc": "???"
+                }
+            }
+        ],
+        "color": [
+            {
+                "_attributes": {
+                    "argb": "-65536"
+                }
+            }
+        ],
+        "height": [
+            {
+                "_attributes": {
+                    "value": "54.864000000000004"
+                }
+            }
+        ],
+        "_geofence": [
+            {
+                "_attributes": {
+                    "elevationMonitored": "true",
+                    "minElevation": "0.0",
+                    "monitor": "All",
+                    "trigger": "Both",
+                    "tracking": "false",
+                    "maxElevation": "54.864000000000004",
+                    "boundingSphere": "96000.0"
+                }
+            }
+        ],
+        "link": [
+            {
+                "_attributes": {
+                    "point": "39.30098401,-121.4375"
+                }
+            },
+            {
+                "_attributes": {
+                    "point": "39.29844376,-121.4002184"
+                }
+            },
+            {
+                "_attributes": {
+                    "url": "https://tfr.faa.gov/save_pages/detail_3_3868.html",
+                    "type": "",
+                    "remarks": null,
+                    "relation": "r-u",
+                    "mime": "text/html",
+                    "version": "1.0",
+                    "production_time": ""
+                }
+            }
+        ]
+    }
+}

@@ -61,438 +61,438 @@
     "icon": "font-awesome/fa-plane",
     "flow": [
         {
-        "id": "816b3b616d151b8e",
-        "type": "html",
-        "z": "70eb72484ca97dd5",
-        "name": "FAA Data Parse",
-        "property": "payload",
-        "outproperty": "payload",
-        "tag": "html body div table tbody tr td.bodyText table tbody tr",
-        "ret": "text",
-        "as": "single",
-        "x": 850,
-        "y": 180,
-        "wires": [
-            [
-                "ccaea53612365aeb"
+            "id": "816b3b616d151b8e",
+            "type": "html",
+            "z": "70eb72484ca97dd5",
+            "name": "FAA Data Parse",
+            "property": "payload",
+            "outproperty": "payload",
+            "tag": "html body div table tbody tr td.bodyText table tbody tr",
+            "ret": "text",
+            "as": "single",
+            "x": 850,
+            "y": 180,
+            "wires": [
+                [
+                    "ccaea53612365aeb"
+                ]
             ]
-        ]
-    },
-    {
-        "id": "ccaea53612365aeb",
-        "type": "function",
-        "z": "70eb72484ca97dd5",
-        "name": "Convert TFR List to JSON Object",
-        "func": "var rawtfr = msg.payload;\nvar result1 = [];\nvar result = [];\nconst regexdate = /[\\S].*[^\\s]/g;\nvar key = [\"date\",\"notam\",\"ctr\",\"st\",\"rsn\",\"loc\"];\n\nfor (var i = 6; i < rawtfr.length - 3; i++) {\n\n    let line = rawtfr[i].trim(); //get the next line\n    if (!line) continue; //skip blanks\n    result[i-6] = rawtfr[i].match(regexdate);\n}\n\nmsg.payload = result;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1090,
-        "y": 180,
-        "wires": [
-            [
-                "d64e2bcaf2644df8"
+        },
+        {
+            "id": "ccaea53612365aeb",
+            "type": "function",
+            "z": "70eb72484ca97dd5",
+            "name": "Convert TFR List to JSON Object",
+            "func": "var rawtfr = msg.payload;\nvar result1 = [];\nvar result = [];\nconst regexdate = /[\\S].*[^\\s]/g;\nvar key = [\"date\",\"notam\",\"ctr\",\"st\",\"rsn\",\"loc\"];\n\nfor (var i = 6; i < rawtfr.length - 3; i++) {\n\n    let line = rawtfr[i].trim(); //get the next line\n    if (!line) continue; //skip blanks\n    result[i-6] = rawtfr[i].match(regexdate);\n}\n\nmsg.payload = result;\nreturn msg;",
+            "outputs": 1,
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [],
+            "x": 1090,
+            "y": 180,
+            "wires": [
+                [
+                    "d64e2bcaf2644df8"
+                ]
             ]
-        ]
-    },
-    {
-        "id": "d64e2bcaf2644df8",
-        "type": "function",
-        "z": "70eb72484ca97dd5",
-        "name": "Clean Up for UI Table",
-        "func": "var lines = msg.payload;\nvar output = [];\nconst url1 = \"https://tfr.faa.gov/save_pages/detail_\";\nconst url2 = \".html\";\nconst regexlocal = /\\//g;\nconst regexdate = /[\\S].*[^\\s]/g;\nconst regexspace = /(\\S)/g;\n\nfor (var i = 0; i < lines.length; i++) {\n    output[i] = {\n        \"date\": lines[i][0], //new Date(lines[\"0\"][i]).toDateString(), \n        \"notam\": lines[i][1].replace(regexlocal,\"_\").trim(),\n        \"notamurl\": url1 + lines[i][1].replace(regexlocal,\"_\") + url2,\n        \"ctrr\": lines[i][2],\n        \"st\": lines[i][3], \n        \"rsn\": lines[i][4], \n        \"loc\": lines[i][5], \n    };\n}\nvar tfrList = [];\nfor (var j = 0; j < output.length; j++) {\n    tfrList[j] = output[j].notamurl.replace(\"html\",\"xml\");\n}\nif (tfrList.length == 0) {\n    msg.topic = \"noTFRs\";\n} else {\n    msg.topic = \"tfr\";\n}\nmsg.tfr_list = tfrList;\nmsg.payload = output;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 280,
-        "y": 240,
-        "wires": [
-            [
-                "58dfa8bd564812d3"
+        },
+        {
+            "id": "d64e2bcaf2644df8",
+            "type": "function",
+            "z": "70eb72484ca97dd5",
+            "name": "Clean Up for UI Table",
+            "func": "var lines = msg.payload;\nvar output = [];\nconst url1 = \"https://tfr.faa.gov/save_pages/detail_\";\nconst url2 = \".html\";\nconst regexlocal = /\\//g;\nconst regexdate = /[\\S].*[^\\s]/g;\nconst regexspace = /(\\S)/g;\n\nfor (var i = 0; i < lines.length; i++) {\n    output[i] = {\n        \"date\": lines[i][0], //new Date(lines[\"0\"][i]).toDateString(), \n        \"notam\": lines[i][1].replace(regexlocal,\"_\").trim(),\n        \"notamurl\": url1 + lines[i][1].replace(regexlocal,\"_\") + url2,\n        \"ctrr\": lines[i][2],\n        \"st\": lines[i][3], \n        \"rsn\": lines[i][4], \n        \"loc\": lines[i][5], \n    };\n}\nvar tfrList = [];\nfor (var j = 0; j < output.length; j++) {\n    tfrList[j] = output[j].notamurl.replace(\"html\",\"xml\");\n}\nif (tfrList.length == 0) {\n    msg.topic = \"noTFRs\";\n} else {\n    msg.topic = \"tfr\";\n}\nmsg.tfr_list = tfrList;\nmsg.payload = output;\nreturn msg;",
+            "outputs": 1,
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [],
+            "x": 280,
+            "y": 240,
+            "wires": [
+                [
+                    "58dfa8bd564812d3"
+                ]
             ]
-        ]
-    },
-    {
-        "id": "5249d77ebaebf168",
-        "type": "function",
-        "z": "70eb72484ca97dd5",
-        "name": "Split TFR Array",
-        "func": "for (var i = 0; i < msg.tfr_list.length; i++) {\n    var newMsg = {};\n    newMsg.url = msg.tfr_list[i];\n    newMsg.method = \"GET\"\n    node.send(newMsg);\n}\nreturn null;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 680,
-        "y": 240,
-        "wires": [
-            [
-                "6df4843a1c805046"
+        },
+        {
+            "id": "5249d77ebaebf168",
+            "type": "function",
+            "z": "70eb72484ca97dd5",
+            "name": "Split TFR Array",
+            "func": "for (var i = 0; i < msg.tfr_list.length; i++) {\n    var newMsg = {};\n    newMsg.url = msg.tfr_list[i];\n    newMsg.method = \"GET\"\n    node.send(newMsg);\n}\nreturn null;",
+            "outputs": 1,
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [],
+            "x": 680,
+            "y": 240,
+            "wires": [
+                [
+                    "6df4843a1c805046"
+                ]
             ]
-        ]
-    },
-    {
-        "id": "6df4843a1c805046",
-        "type": "http request",
-        "z": "70eb72484ca97dd5",
-        "name": "Get TFR xml",
-        "method": "use",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "senderr": false,
-        "headers": [],
-        "x": 860,
-        "y": 240,
-        "wires": [
-            [
-                "837fc8f45379f72a"
+        },
+        {
+            "id": "6df4843a1c805046",
+            "type": "http request",
+            "z": "70eb72484ca97dd5",
+            "name": "Get TFR xml",
+            "method": "use",
+            "ret": "txt",
+            "paytoqs": "ignore",
+            "url": "",
+            "tls": "",
+            "persist": false,
+            "proxy": "",
+            "insecureHTTPParser": false,
+            "authType": "",
+            "senderr": false,
+            "headers": [],
+            "x": 860,
+            "y": 240,
+            "wires": [
+                [
+                    "837fc8f45379f72a"
+                ]
             ]
-        ]
-    },
-    {
-        "id": "2268bb2949af523c",
-        "type": "xml",
-        "z": "70eb72484ca97dd5",
-        "name": "",
-        "property": "payload",
-        "attr": "",
-        "chr": "",
-        "x": 1250,
-        "y": 240,
-        "wires": [
-            [
-                "03edc968b374595f"
+        },
+        {
+            "id": "2268bb2949af523c",
+            "type": "xml",
+            "z": "70eb72484ca97dd5",
+            "name": "",
+            "property": "payload",
+            "attr": "",
+            "chr": "",
+            "x": 1250,
+            "y": 240,
+            "wires": [
+                [
+                    "03edc968b374595f"
+                ]
             ]
-        ]
-    },
-    {
-        "id": "03edc968b374595f",
-        "type": "function",
-        "z": "70eb72484ca97dd5",
-        "name": "NOTAM cot_attrib",
-        "func": "const payload = msg.payload;\nconst tfr_dict = payload[\"XNOTAM-Update\"].Group[0].Add[0].Not[0];\nconst tfr_info = tfr_dict.TfrNot[0].TFRAreaGroup;\n\nconst cot_attrib_template = {\n    \"how\": \"h-e\", //h-g-i-g-o, etc\n    \"type\": \"u-d-f\",//\"a-u-G\"\n    \"lat\": parseFloat(\"0.0\"),\n    \"lon\": parseFloat(\"0.0\"),\n    \"altitude\": parseFloat(\"9999999.0\"),\n    \"callsign\": \"\",\n    \"uid\": \"\",\n    \"stale\": \"\",\n    \"detail\": {\n        \"cot2525\": \"a-h-G\",\n        \"marker_color\": \"-1\",\n        \"pli\": {\n            \"groupName\": null,\n            \"role\": null,\n            \"phone\": null,\n        },\n        \"dest\": {\n            \"uid\": \"ANDROID-1c2680c542b6c9f6\",\n            \"mission\": null,\n            \"callsign\": null\n        },\n        \"link\": {\n            \"url\": null,\n            \"remarks\": null,\n            \"uid\": \"nodered\",\n            \"parent_callsign\": \"Some callsign from NodeRED\",\n            \"production_time\": \"\"\n        },\n        \"remarks\": \"\",\n        \"marker\": {\n            \"iconsetpath\": \"\",\n            \"color\": \"\"\n        },\n        \"shape\": {\n            \"distance\": null,\n            \"color\": \"-65536\",\n            \"LineStyle\": {\n                \"color\": \"ff0000\", //hex e.g.\"ffff0000\"\n                \"width\": \"1.0\", //3.0\n            },\n            \"PolyStyle\": {\n                \"color\": \"ff0000\", //hex e.g.\"ffff0000\"\n            },\n            \"strokecolor\": \"-65536\", //value='-65536'/>\n            \"strokeweight\": \"1.0\",//'3.0'\n            \"fillColor\": \"\", //value='16711680\n            \"labels_on\": \"true\" //value = \"true\" or \"false\"\n        },\n        \"callsign\": \"\",\n        \"height\": null\n    }\n};\nfor (var i = 0; i < tfr_info.length; i++){\n    /*var coordinatesA = tfr_info[i].abdMergedArea[0].Avx;\n\n    var coordinates = [];\n    var x = 0;\n    var y = 0;\n    for (var j = 0; j < coordinatesA.length; j++) {\n        var coordinate = coordinatesA[j].split(',');\n        x += parseFloat(coordinate[1]);\n        y += parseFloat(coordinate[0]);\n    }\n    var centroid = {\n        'lat': (x / coordinates.length).toString(),\n        'lon': (y / coordinates.length).toString()\n    };*/\n\n    const tfr_id = tfr_dict.NotUid[0].codeGUID[0];//txtLocalName[0].replace(\"/\", \"_\");\n    var tfr_base_label = \"3-\"+tfr_dict.NotUid[0].noSeqNo[0];\n    //var url = \"https://tfr.faa.gov/save_pages/detail_\"+tfr_id+\".html\";\n    var url = msg.url.replace(\"xml\",\"html\")\n    var remarks = tfr_dict.txtDescrTraditional[0];\n    if (i >= 1) {\n        var label_area = tfr_info[i].aseTFRArea[0].txtName[0]\n    } else {\n        label_area = \"\";\n    }\n\n    var cot_attrib = cot_attrib_template;\n    cot_attrib.callsign = (\"tfr-\"+tfr_base_label+\" \"+label_area).trim();\n    cot_attrib.detail.callsign = (\"tfr-\" + tfr_base_label + \" \" + label_area).trim();\n    cot_attrib.uid = (tfr_id+\" \"+label_area).trim();//\"tfr.\"+tfr_id.replace(\"_\",\"-\");\n    cot_attrib.detail.remarks = remarks;\n    cot_attrib.detail.link.url = url;\n    \n    //GET COORDINATES & ALTITUDE:\n    let kml_coordinates = tfr_info[i].aseShapes[0].Abd[0].Avx[0];\n    cot_attrib.lat = parseFloat(kml_coordinates.geoLat[0].replace(\"N\",\"\"));\n    cot_attrib.lon = parseFloat(\"-\"+kml_coordinates.geoLong[0].replace(\"W\",\"\"));\n    let height = parseFloat(tfr_info[i].aseTFRArea[0].valDistVerUpper[0]);\n    if (height !== undefined && height !== null) {\n        cot_attrib.detail.height = parseFloat(tfr_info[i].aseTFRArea[0].valDistVerUpper[0]) * 0.3048;\n    };\n    //Get Link Points:\n    var linkPoints = tfr_info[i].abdMergedArea[0].Avx;\n    var link_points = [];\n    for (var j=0;j < linkPoints.length; j++) {\n        link_points[j] = linkPoints[j].geoLat[0].replace(\"N\", \"\") + \",-\" + linkPoints[j].geoLong[0].replace(\"W\", \"\")\n    };\n\n    // Function to process each line and reverse [0] and [1] while deleting [2]\n    function processLine(line) {\n        var coords = line.split(\",\");\n        return [parseFloat(coords[0]), parseFloat(coords[1])];\n    }\n\n    // Map the lines array to process each line\n    var link_points_list = link_points.map(processLine);\n\n    var links = link_points_list.map(function (item) {\n        // Convert the array of coordinates to a string\n        var coordinateString = item.join(\",\");\n        // Use this string as the key in the new object\n        return { [\"_attributes\"]: { \"point\": coordinateString } };\n    });\n};\n\nmsg.payload = cot_attrib;\nmsg.linkPoints = { \"link\": links };\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [
-            {
-                "var": "axios",
-                "module": "axios"
-            }
-        ],
-        "x": 300,
-        "y": 300,
-        "wires": [
-            [
-                "8f75d304e5f11f38"
-            ]
-        ]
-    },
-    {
-        "id": "58dfa8bd564812d3",
-        "type": "switch",
-        "z": "70eb72484ca97dd5",
-        "name": "Check if TFRs",
-        "property": "topic",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "tfr",
-                "vt": "str"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 1,
-        "x": 490,
-        "y": 240,
-        "wires": [
-            [
-                "5249d77ebaebf168"
-            ]
-        ]
-    },
-    {
-        "id": "8f75d304e5f11f38",
-        "type": "function",
-        "z": "70eb72484ca97dd5",
-        "name": "JSON to PLI CoT ",
-        "func": "var payload = msg.payload;\nvar uid = payload.uid;\nvar lat = payload.lat;\nvar lon = payload.lon;\nvar altitude = payload.altitude;\n\nvar how = payload.how;\nvar type = payload.type;\nvar detail = payload.detail\nvar stale = \"\";\n\nif (payload.stale){\n    stale = payload.stale;\n} else {\n    const cinco = 10 * 60 * 1000;\n    stale = new Date(Date.now() + 2 * cinco).toISOString();\n};\n\nif (uid != null) {\n    if (lat != null) {\n        if (lon != null) {\n            let newpayload = {\n                \"event\": {\n                    \"_attributes\": {\n                        \"version\": \"2.0\",\n                        \"uid\": uid,\n                        \"type\": type,\n                        \"how\": how,\n                        \"time\": new Date(Date.now()).toISOString(),\n                        \"start\": new Date(Date.now()).toISOString(),\n                        \"stale\": stale,\n                    },\n                    \"point\": {\n                        \"_attributes\": {\n                            \"lat\": JSON.stringify(lat),\n                            \"lon\": JSON.stringify(lon),\n                            \"hae\": \"9999999.0\",\n                            \"ce\": \"9999999.0\",\n                            \"le\": \"9999999.0\",\n                        }\n                    },\n                    \"detail\": {\n                    }\n                }\n            }\n            msg.payload = newpayload;\n            msg.cot_detail = detail\n            msg.topic = how;\n            msg.type = type;\n            return msg;\n        } else {\n            msg.topic = \"unknown\"\n            return msg;\n        }\n    }\n} else {\n    msg.topic = \"incomplete\"\n    return msg;\n}",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 510,
-        "y": 300,
-        "wires": [
-            [
-                "fba1b2c9ff2e5ada"
-            ]
-        ],
-        "inputLabels": [
-            "msg.payload CoT Attributes"
-        ],
-        "outputLabels": [
-            "CoT (JSON-ified)"
-        ],
-        "info": "# JSON 2 COT - PLI\n\n## JSON INPUT\n```json\nmsg.payload = {\n    \"lat\": float,\n    \"lon\": float,\n    \"altitude\": float,\n    \"callsign\": string,\n    \"uid\": string,\n    \"stale\": time,\n    \"groupName\": string,\n    \"role\": string,\n    \"phone\" string //10 digit with no demarcation\n}\n```\n"
-    },
-    {
-        "id": "fba1b2c9ff2e5ada",
-        "type": "function",
-        "z": "70eb72484ca97dd5",
-        "name": "cot_detail_freeforrm_polygon",
-        "func": "/*\n    Example JSON containing the keys and values for popular cursor on target CoT\nfields, including time, point latitude & longitude, type, and more.\n* /\n\n/* Stale is Date.now() + milliseconds\n Ruberic: 1000 Milliseconds in 1 Second\n Example:  5 minutes, in milliseconds, is 300000\n   (5 x 60 * 1000)\n*/\n\nconst cinco = 5 * 60 * 1000;\nconst diez = 2 * cinco;\nvar stale = new Date(Date.now() + diez).toISOString();\n\nconst destination = msg.destination;\nconst detail = msg.cot_detail\nconst cot_base = msg.payload\nvar new_cot = cot_base;\n\nvar strokeColor = [\n    {\n        \"_attributes\": {\n            \"value\": \"\"\n        }\n    }\n];\nnew_cot.event.detail.strokeColor = strokeColor;\nif (detail.shape.strokecolor !== null && detail.shape.strokecolor !== \"\") {\n    new_cot.event.detail.strokeColor[0]._attributes.value = detail.shape.strokecolor;\n} else {\n    new_cot.event.detail.strokeColor[0]._attributes.value = \"-65536\"\n};\nvar strokeWeight = [\n    {\n        \"_attributes\": {\n            \"value\": \"2.0\"\n        }\n    }\n    ];\nnew_cot.event.detail.strokeWeight = strokeWeight;\nif (detail.shape.strokeweight !== null && detail.shape.strokeweight !== \"\"){\n    new_cot.event.detail.strokeWeight[0]._attributes.value = detail.shape.strokeweight;\n} else {\n    new_cot.event.detail.strokeWeight[0]._attributes.value = \"2.0\"\n};\nvar fillColor = [\n    {\n        \"_attributes\": {\n        \"value\": \"\"\n        }\n    }\n];\nnew_cot.event.detail.fillColor = fillColor;\nif (detail.shape.fillcolor !== null && detail.shape.fillcolor !== \"\") {\n    new_cot.event.detail.fillColor[0]._attributes.value = detail.shape.fillcolor;\n} else {};\n\nvar contact = [\n    {\n        \"_attributes\": {\n            \"callsign\": \"\"\n        }\n    }\n];\nnew_cot.event.detail.contact = contact;\nif (detail.callsign !== null && detail.callsign !== \"\") {\n    new_cot.event.detail.contact[0]._attributes.callsign = detail.callsign;\n} else {\n    new_cot.event.detail.contact[0]._attributes.callsign = new_cot.event._attributes.uid;\n};\n\nvar remarks = \"\";\nnew_cot.event.detail.remarks = remarks;\nif (detail.remarks !== null) {\n    new_cot.event.detail.remarks = detail.remarks\n};\n    \nvar archive= \"\";\nnew_cot.event.detail.archive = archive;\n\nvar labels_on = [\n    {\n        \"_attributes\": {\n            \"value\": \"true\"\n        }\n    }\n];\nnew_cot.event.detail.labels_on = labels_on;\nif (detail.labels_on !== null && detail.labels_on === \"true\") {\n    new_cot.event.detail.labels_on._attributes.value = \"true\"\n};\nvar precisionlocation = [\n    {\n        \"_attributes\": {\n            \"altsrc\": \"???\"\n        }\n    }\n];\nnew_cot.event.detail.precisionlocation = precisionlocation;\nvar color = [\n    {\n        \"_attributes\": {\n            \"argb\": \"-65536\"\n        }\n    }\n];\nnew_cot.event.detail.color = color;\nif (detail.shape.color !== null && detail.shape.color !== \"\") {\n    new_cot.event.detail.color[0]._attributes.argb = detail.shape.color;\n};\nvar height_attrib = [\n    {\n        \"_attributes\": {\n            \"value\": \"0.0\"\n        }\n    }\n];\n\nnew_cot.event.detail.height = height_attrib;\nif (detail.height !== null && detail.height !== undefined && detail.height !== \"\") {\n    var height = detail.height;\n    new_cot.event.detail.height[0]._attributes.value = JSON.stringify(height);\n};\nvar geofence_attrib = [\n    {\n        \"_attributes\": {\n            \"elevationMonitored\": \"true\",\n            \"minElevation\": \"0.0\",\n            \"monitor\": \"All\",\n            \"trigger\": \"Both\",\n            \"tracking\": \"false\",\n            \"maxElevation\":\"12500\",\n            \"boundingSphere\":\"96000.0\"\n        }\n    }\n];\nnew_cot.event.detail._geofence = geofence_attrib;\nif (height !== undefined && height !== null && height !== \"\"){\n    new_cot.event.detail._geofence[0]._attributes.maxElevation = JSON.stringify(height);\n};\n\nmsg.payload = new_cot;\nmsg.cot_detail = detail;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 750,
-        "y": 300,
-        "wires": [
-            [
-                "273f997eaf27d6d4"
-            ]
-        ]
-    },
-    {
-        "id": "273f997eaf27d6d4",
-        "type": "change",
-        "z": "70eb72484ca97dd5",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload.event.detail.link",
-                "pt": "msg",
-                "to": "linkPoints.link",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1040,
-        "y": 300,
-        "wires": [
-            [
-                "276aa81df27e53c1"
-            ]
-        ]
-    },
-    {
-        "id": "276aa81df27e53c1",
-        "type": "function",
-        "z": "70eb72484ca97dd5",
-        "name": "Add Link URL",
-        "func": "const detail = msg.cot_detail;\nconst cot_base = msg.payload;\nvar new_cot = cot_base;\n//var links = cot_base.event\nvar link_attrib =[\n    {\n        \"_attributes\": {\n            \"url\": \"\",\n            //\"uid\": new_cot.event.uid + \".Style\", // the pass uid must match under event._attribute and \".Style\" to it\n            \"type\": \"\",\n            \"remarks\": \"\",\n            \"relation\": \"r-u\",\n            \"mime\": \"text/html\",\n            \"version\": \"1.0\"\n        }\n    }\n];\n\nvar url = false;\n//if (new_cot.detail.link !== null && new_cot.detail.link !== undefined) {\nif (detail.link.url !== undefined){ //&& detail.link.url !== \"\") {\n    url = true;\n    var linkLength = new_cot.event.detail.link.length;\n    new_cot.event.detail.link[linkLength] = link_attrib[0];\n    new_cot.event.detail.link[linkLength]._attributes.url = detail.link.url;\n    //new_cot.event.detail.link[linkLength][0]._attributes.type = detail.cot_type;\n    new_cot.event.detail.link[linkLength]._attributes.remarks = detail.link.remarks;\n    new_cot.event.detail.link[linkLength]._attributes.production_time = detail.link.production_time;\n};\n//}\n\nif (url === true) {\n    msg.payload = new_cot\n    return msg;\n}  else {\n    msg.payload = cot_base;\n    return msg;\n}\n\n//msg.payload = new_cot;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 310,
-        "y": 360,
-        "wires": [
-            [
-                "0acbcc36d9ae2bfb"
-            ]
-        ]
-    },
-    {
-        "id": "32ff4bbb06221e33",
-        "type": "function",
-        "z": "70eb72484ca97dd5",
-        "name": "Check State",
-        "func": "const payload = msg.payload.trim();\n\n//Verify payload is a valid US State\nvar states = [\"AL\", \"AK\", \"AZ\", \"AR\", \"CA\", \"CO\", \"CT\", \"DE\", \"FL\", \"GA\", \"HI\", \"ID\", \"IL\", \"IN\", \"IA\", \"KS\", \"KY\", \"LA\", \"ME\", \"MD\", \"MA\", \"MI\", \"MN\", \"MS\", \"MO\", \"MT\", \"NE\", \"NV\", \"NH\", \"NJ\", \"NM\", \"NY\", \"NC\", \"ND\", \"OH\", \"OK\", \"OR\", \"PA\", \"RI\", \"SC\", \"SD\", \"TN\", \"TX\", \"UT\", \"VT\", \"VA\", \"WA\", \"WV\", \"WI\", \"WY\"];\n\n//URL if no state provided - downloads ALL TFRs\nconst noStateUrl = \"https://tfr.faa.gov/tfr2/list.jsp?type=all&sort=d&up=Y\";\n\nvar isState = states.includes(msg.payload.toUpperCase()); \nvar default_state = env.get(\"default_state\")\nif (payload !== undefined && payload !== null && payload !== \"\") {\n    var isState = states.includes(msg.payload.toUpperCase());\n    if (isState === true) {\n        var state = msg.payload.toUpperCase();\n        msg.url = 'https://tfr.faa.gov/tfr2/list.jsp?p=list&state='+state+'&type=all&sort=d&up=N';\n        return msg;\n    } else if (default_state !== undefined && default_state !== null && default_state !== \"\") {\n        state = default_state.toUpperCase();\n        msg.url = 'https://tfr.faa.gov/tfr2/list.jsp?p=list&state=' + state + '&type=all&sort=d&up=N';\n        return msg;\n    }\n} else if (default_state !== undefined && default_state !== null && default_state !== \"\") {\n    state = default_state.toUpperCase();\n    msg.url = 'https://tfr.faa.gov/tfr2/list.jsp?p=list&state=' + state + '&type=all&sort=d&up=N';\n    msg.method = \"GET\"\n    return msg;\n} else {\n    msg.url = noStateUrl;\n    return msg;\n};",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 230,
-        "y": 180,
-        "wires": [
-            [
-                "58d5207abfdbe44d"
-            ]
-        ]
-    },
-    {
-        "id": "58d5207abfdbe44d",
-        "type": "http request",
-        "z": "70eb72484ca97dd5",
-        "name": "Get TFR List",
-        "method": "GET",
-        "ret": "txt",
-        "paytoqs": "body",
-        "url": "",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "senderr": false,
-        "headers": [],
-        "x": 400,
-        "y": 180,
-        "wires": [
-            [
-                "be1debb9ee1a67c5"
-            ]
-        ]
-    },
-    {
-        "id": "0acbcc36d9ae2bfb",
-        "type": "change",
-        "z": "70eb72484ca97dd5",
-        "name": "Clean Up",
-        "rules": [
-            {
-                "t": "delete",
-                "p": "url",
-                "pt": "msg"
-            },
-            {
-                "t": "delete",
-                "p": "method",
-                "pt": "msg"
-            },
-            {
-                "t": "delete",
-                "p": "statusCode",
-                "pt": "msg"
-            },
-            {
-                "t": "delete",
-                "p": "headers",
-                "pt": "msg"
-            },
-            {
-                "t": "delete",
-                "p": "responseUrl",
-                "pt": "msg"
-            },
-            {
-                "t": "delete",
-                "p": "redirectList",
-                "pt": "msg"
-            },
-            {
-                "t": "delete",
-                "p": "retry",
-                "pt": "msg"
-            },
-            {
-                "t": "delete",
-                "p": "responseCookies",
-                "pt": "msg"
-            },
-            {
-                "t": "delete",
-                "p": "linkPoints",
-                "pt": "msg"
-            },
-            {
-                "t": "delete",
-                "p": "cot_detail",
-                "pt": "msg"
-            },
-            {
-                "t": "delete",
-                "p": "topic",
-                "pt": "msg"
-            },
-            {
-                "t": "delete",
-                "p": "type",
-                "pt": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 490,
-        "y": 360,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "be1debb9ee1a67c5",
-        "type": "switch",
-        "z": "70eb72484ca97dd5",
-        "name": "Check https statusCode",
-        "property": "statusCode",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "200",
-                "vt": "str"
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 610,
-        "y": 180,
-        "wires": [
-            [
-                "816b3b616d151b8e"
+        },
+        {
+            "id": "03edc968b374595f",
+            "type": "function",
+            "z": "70eb72484ca97dd5",
+            "name": "NOTAM cot_attrib",
+            "func": "const payload = msg.payload;\nconst tfr_dict = payload[\"XNOTAM-Update\"].Group[0].Add[0].Not[0];\nconst tfr_info = tfr_dict.TfrNot[0].TFRAreaGroup;\n\nconst cot_attrib_template = {\n    \"how\": \"h-e\", //h-g-i-g-o, etc\n    \"type\": \"u-d-f\",//\"a-u-G\"\n    \"lat\": parseFloat(\"0.0\"),\n    \"lon\": parseFloat(\"0.0\"),\n    \"altitude\": parseFloat(\"9999999.0\"),\n    \"callsign\": \"\",\n    \"uid\": \"\",\n    \"stale\": \"\",\n    \"detail\": {\n        \"cot2525\": \"a-h-G\",\n        \"marker_color\": \"-1\",\n        \"pli\": {\n            \"groupName\": null,\n            \"role\": null,\n            \"phone\": null,\n        },\n        \"dest\": {\n            \"uid\": \"ANDROID-1c2680c542b6c9f6\",\n            \"mission\": null,\n            \"callsign\": null\n        },\n        \"link\": {\n            \"url\": null,\n            \"remarks\": null,\n            \"uid\": \"nodered\",\n            \"parent_callsign\": \"Some callsign from NodeRED\",\n            \"production_time\": \"\"\n        },\n        \"remarks\": \"\",\n        \"marker\": {\n            \"iconsetpath\": \"\",\n            \"color\": \"\"\n        },\n        \"shape\": {\n            \"distance\": null,\n            \"color\": \"-65536\",\n            \"LineStyle\": {\n                \"color\": \"ff0000\", //hex e.g.\"ffff0000\"\n                \"width\": \"1.0\", //3.0\n            },\n            \"PolyStyle\": {\n                \"color\": \"ff0000\", //hex e.g.\"ffff0000\"\n            },\n            \"strokecolor\": \"-65536\", //value='-65536'/>\n            \"strokeweight\": \"1.0\",//'3.0'\n            \"fillColor\": \"\", //value='16711680\n            \"labels_on\": \"true\" //value = \"true\" or \"false\"\n        },\n        \"callsign\": \"\",\n        \"height\": null\n    }\n};\nfor (var i = 0; i < tfr_info.length; i++){\n    /*var coordinatesA = tfr_info[i].abdMergedArea[0].Avx;\n\n    var coordinates = [];\n    var x = 0;\n    var y = 0;\n    for (var j = 0; j < coordinatesA.length; j++) {\n        var coordinate = coordinatesA[j].split(',');\n        x += parseFloat(coordinate[1]);\n        y += parseFloat(coordinate[0]);\n    }\n    var centroid = {\n        'lat': (x / coordinates.length).toString(),\n        'lon': (y / coordinates.length).toString()\n    };*/\n\n    const tfr_id = tfr_dict.NotUid[0].codeGUID[0];//txtLocalName[0].replace(\"/\", \"_\");\n    var tfr_base_label = \"3-\"+tfr_dict.NotUid[0].noSeqNo[0];\n    //var url = \"https://tfr.faa.gov/save_pages/detail_\"+tfr_id+\".html\";\n    var url = msg.url.replace(\"xml\",\"html\")\n    var remarks = tfr_dict.txtDescrTraditional[0];\n    if (i >= 1) {\n        var label_area = tfr_info[i].aseTFRArea[0].txtName[0]\n    } else {\n        label_area = \"\";\n    }\n\n    var cot_attrib = cot_attrib_template;\n    cot_attrib.callsign = (\"tfr-\"+tfr_base_label+\" \"+label_area).trim();\n    cot_attrib.detail.callsign = (\"tfr-\" + tfr_base_label + \" \" + label_area).trim();\n    cot_attrib.uid = (tfr_id+\" \"+label_area).trim();//\"tfr.\"+tfr_id.replace(\"_\",\"-\");\n    cot_attrib.detail.remarks = remarks;\n    cot_attrib.detail.link.url = url;\n    \n    //GET COORDINATES & ALTITUDE:\n    let kml_coordinates = tfr_info[i].aseShapes[0].Abd[0].Avx[0];\n    cot_attrib.lat = parseFloat(kml_coordinates.geoLat[0].replace(\"N\",\"\"));\n    cot_attrib.lon = parseFloat(\"-\"+kml_coordinates.geoLong[0].replace(\"W\",\"\"));\n    let height = parseFloat(tfr_info[i].aseTFRArea[0].valDistVerUpper[0]);\n    if (height !== undefined && height !== null) {\n        cot_attrib.detail.height = parseFloat(tfr_info[i].aseTFRArea[0].valDistVerUpper[0]) * 0.3048;\n    };\n    //Get Link Points:\n    var linkPoints = tfr_info[i].abdMergedArea[0].Avx;\n    var link_points = [];\n    for (var j=0;j < linkPoints.length; j++) {\n        link_points[j] = linkPoints[j].geoLat[0].replace(\"N\", \"\") + \",-\" + linkPoints[j].geoLong[0].replace(\"W\", \"\")\n    };\n\n    // Function to process each line and reverse [0] and [1] while deleting [2]\n    function processLine(line) {\n        var coords = line.split(\",\");\n        return [parseFloat(coords[0]), parseFloat(coords[1])];\n    }\n\n    // Map the lines array to process each line\n    var link_points_list = link_points.map(processLine);\n\n    var links = link_points_list.map(function (item) {\n        // Convert the array of coordinates to a string\n        var coordinateString = item.join(\",\");\n        // Use this string as the key in the new object\n        return { [\"_attributes\"]: { \"point\": coordinateString } };\n    });\n};\n\nmsg.payload = cot_attrib;\nmsg.linkPoints = { \"link\": links };\nreturn msg;",
+            "outputs": 1,
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [
+                {
+                    "var": "axios",
+                    "module": "axios"
+                }
             ],
-            []
-        ]
-    },
-    {
-        "id": "837fc8f45379f72a",
-        "type": "switch",
-        "z": "70eb72484ca97dd5",
-        "name": "Check https statusCode",
-        "property": "statusCode",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "200",
-                "vt": "str"
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 1060,
-        "y": 240,
-        "wires": [
-            [
-                "2268bb2949af523c"
+            "x": 300,
+            "y": 300,
+            "wires": [
+                [
+                    "8f75d304e5f11f38"
+                ]
+            ]
+        },
+        {
+            "id": "58dfa8bd564812d3",
+            "type": "switch",
+            "z": "70eb72484ca97dd5",
+            "name": "Check if TFRs",
+            "property": "topic",
+            "propertyType": "msg",
+            "rules": [
+                {
+                    "t": "eq",
+                    "v": "tfr",
+                    "vt": "str"
+                }
             ],
-            []
-        ]
-    }
+            "checkall": "true",
+            "repair": false,
+            "outputs": 1,
+            "x": 490,
+            "y": 240,
+            "wires": [
+                [
+                    "5249d77ebaebf168"
+                ]
+            ]
+        },
+        {
+            "id": "8f75d304e5f11f38",
+            "type": "function",
+            "z": "70eb72484ca97dd5",
+            "name": "JSON to PLI CoT ",
+            "func": "var payload = msg.payload;\nvar uid = payload.uid;\nvar lat = payload.lat;\nvar lon = payload.lon;\nvar altitude = payload.altitude;\n\nvar how = payload.how;\nvar type = payload.type;\nvar detail = payload.detail\nvar stale = \"\";\n\nif (payload.stale){\n    stale = payload.stale;\n} else {\n    const cinco = 10 * 60 * 1000;\n    stale = new Date(Date.now() + 2 * cinco).toISOString();\n};\n\nif (uid != null) {\n    if (lat != null) {\n        if (lon != null) {\n            let newpayload = {\n                \"event\": {\n                    \"_attributes\": {\n                        \"version\": \"2.0\",\n                        \"uid\": uid,\n                        \"type\": type,\n                        \"how\": how,\n                        \"time\": new Date(Date.now()).toISOString(),\n                        \"start\": new Date(Date.now()).toISOString(),\n                        \"stale\": stale,\n                    },\n                    \"point\": {\n                        \"_attributes\": {\n                            \"lat\": JSON.stringify(lat),\n                            \"lon\": JSON.stringify(lon),\n                            \"hae\": \"9999999.0\",\n                            \"ce\": \"9999999.0\",\n                            \"le\": \"9999999.0\",\n                        }\n                    },\n                    \"detail\": {\n                    }\n                }\n            }\n            msg.payload = newpayload;\n            msg.cot_detail = detail\n            msg.topic = how;\n            msg.type = type;\n            return msg;\n        } else {\n            msg.topic = \"unknown\"\n            return msg;\n        }\n    }\n} else {\n    msg.topic = \"incomplete\"\n    return msg;\n}",
+            "outputs": 1,
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [],
+            "x": 510,
+            "y": 300,
+            "wires": [
+                [
+                    "fba1b2c9ff2e5ada"
+                ]
+            ],
+            "inputLabels": [
+                "msg.payload CoT Attributes"
+            ],
+            "outputLabels": [
+                "CoT (JSON-ified)"
+            ],
+            "info": "# JSON 2 COT - PLI\n\n## JSON INPUT\n```json\nmsg.payload = {\n    \"lat\": float,\n    \"lon\": float,\n    \"altitude\": float,\n    \"callsign\": string,\n    \"uid\": string,\n    \"stale\": time,\n    \"groupName\": string,\n    \"role\": string,\n    \"phone\" string //10 digit with no demarcation\n}\n```\n"
+        },
+        {
+            "id": "fba1b2c9ff2e5ada",
+            "type": "function",
+            "z": "70eb72484ca97dd5",
+            "name": "cot_detail_freeforrm_polygon",
+            "func": "/*\n    Example JSON containing the keys and values for popular cursor on target CoT\nfields, including time, point latitude & longitude, type, and more.\n* /\n\n/* Stale is Date.now() + milliseconds\n Ruberic: 1000 Milliseconds in 1 Second\n Example:  5 minutes, in milliseconds, is 300000\n   (5 x 60 * 1000)\n*/\n\nconst cinco = 5 * 60 * 1000;\nconst diez = 2 * cinco;\nvar stale = new Date(Date.now() + diez).toISOString();\n\nconst destination = msg.destination;\nconst detail = msg.cot_detail\nconst cot_base = msg.payload\nvar new_cot = cot_base;\n\nvar strokeColor = [\n    {\n        \"_attributes\": {\n            \"value\": \"\"\n        }\n    }\n];\nnew_cot.event.detail.strokeColor = strokeColor;\nif (detail.shape.strokecolor !== null && detail.shape.strokecolor !== \"\") {\n    new_cot.event.detail.strokeColor[0]._attributes.value = detail.shape.strokecolor;\n} else {\n    new_cot.event.detail.strokeColor[0]._attributes.value = \"-65536\"\n};\nvar strokeWeight = [\n    {\n        \"_attributes\": {\n            \"value\": \"2.0\"\n        }\n    }\n    ];\nnew_cot.event.detail.strokeWeight = strokeWeight;\nif (detail.shape.strokeweight !== null && detail.shape.strokeweight !== \"\"){\n    new_cot.event.detail.strokeWeight[0]._attributes.value = detail.shape.strokeweight;\n} else {\n    new_cot.event.detail.strokeWeight[0]._attributes.value = \"2.0\"\n};\nvar fillColor = [\n    {\n        \"_attributes\": {\n        \"value\": \"\"\n        }\n    }\n];\nnew_cot.event.detail.fillColor = fillColor;\nif (detail.shape.fillcolor !== null && detail.shape.fillcolor !== \"\") {\n    new_cot.event.detail.fillColor[0]._attributes.value = detail.shape.fillcolor;\n} else {};\n\nvar contact = [\n    {\n        \"_attributes\": {\n            \"callsign\": \"\"\n        }\n    }\n];\nnew_cot.event.detail.contact = contact;\nif (detail.callsign !== null && detail.callsign !== \"\") {\n    new_cot.event.detail.contact[0]._attributes.callsign = detail.callsign;\n} else {\n    new_cot.event.detail.contact[0]._attributes.callsign = new_cot.event._attributes.uid;\n};\n\nvar remarks = \"\";\nnew_cot.event.detail.remarks = remarks;\nif (detail.remarks !== null) {\n    new_cot.event.detail.remarks = detail.remarks\n};\n    \nvar archive= \"\";\nnew_cot.event.detail.archive = archive;\n\nvar labels_on = [\n    {\n        \"_attributes\": {\n            \"value\": \"true\"\n        }\n    }\n];\nnew_cot.event.detail.labels_on = labels_on;\nif (detail.labels_on !== null && detail.labels_on === \"true\") {\n    new_cot.event.detail.labels_on._attributes.value = \"true\"\n};\nvar precisionlocation = [\n    {\n        \"_attributes\": {\n            \"altsrc\": \"???\"\n        }\n    }\n];\nnew_cot.event.detail.precisionlocation = precisionlocation;\nvar color = [\n    {\n        \"_attributes\": {\n            \"argb\": \"-65536\"\n        }\n    }\n];\nnew_cot.event.detail.color = color;\nif (detail.shape.color !== null && detail.shape.color !== \"\") {\n    new_cot.event.detail.color[0]._attributes.argb = detail.shape.color;\n};\nvar height_attrib = [\n    {\n        \"_attributes\": {\n            \"value\": \"0.0\"\n        }\n    }\n];\n\nnew_cot.event.detail.height = height_attrib;\nif (detail.height !== null && detail.height !== undefined && detail.height !== \"\") {\n    var height = detail.height;\n    new_cot.event.detail.height[0]._attributes.value = JSON.stringify(height);\n};\nvar geofence_attrib = [\n    {\n        \"_attributes\": {\n            \"elevationMonitored\": \"true\",\n            \"minElevation\": \"0.0\",\n            \"monitor\": \"All\",\n            \"trigger\": \"Both\",\n            \"tracking\": \"false\",\n            \"maxElevation\":\"12500\",\n            \"boundingSphere\":\"96000.0\"\n        }\n    }\n];\nnew_cot.event.detail._geofence = geofence_attrib;\nif (height !== undefined && height !== null && height !== \"\"){\n    new_cot.event.detail._geofence[0]._attributes.maxElevation = JSON.stringify(height);\n};\n\nmsg.payload = new_cot;\nmsg.cot_detail = detail;\nreturn msg;",
+            "outputs": 1,
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [],
+            "x": 750,
+            "y": 300,
+            "wires": [
+                [
+                    "273f997eaf27d6d4"
+                ]
+            ]
+        },
+        {
+            "id": "273f997eaf27d6d4",
+            "type": "change",
+            "z": "70eb72484ca97dd5",
+            "name": "",
+            "rules": [
+                {
+                    "t": "set",
+                    "p": "payload.event.detail.link",
+                    "pt": "msg",
+                    "to": "linkPoints.link",
+                    "tot": "msg"
+                }
+            ],
+            "action": "",
+            "property": "",
+            "from": "",
+            "to": "",
+            "reg": false,
+            "x": 1040,
+            "y": 300,
+            "wires": [
+                [
+                    "276aa81df27e53c1"
+                ]
+            ]
+        },
+        {
+            "id": "276aa81df27e53c1",
+            "type": "function",
+            "z": "70eb72484ca97dd5",
+            "name": "Add Link URL",
+            "func": "const detail = msg.cot_detail;\nconst cot_base = msg.payload;\nvar new_cot = cot_base;\n//var links = cot_base.event\nvar link_attrib =[\n    {\n        \"_attributes\": {\n            \"url\": \"\",\n            //\"uid\": new_cot.event.uid + \".Style\", // the pass uid must match under event._attribute and \".Style\" to it\n            \"type\": \"\",\n            \"remarks\": \"\",\n            \"relation\": \"r-u\",\n            \"mime\": \"text/html\",\n            \"version\": \"1.0\"\n        }\n    }\n];\n\nvar url = false;\n//if (new_cot.detail.link !== null && new_cot.detail.link !== undefined) {\nif (detail.link.url !== undefined){ //&& detail.link.url !== \"\") {\n    url = true;\n    var linkLength = new_cot.event.detail.link.length;\n    new_cot.event.detail.link[linkLength] = link_attrib[0];\n    new_cot.event.detail.link[linkLength]._attributes.url = detail.link.url;\n    //new_cot.event.detail.link[linkLength][0]._attributes.type = detail.cot_type;\n    new_cot.event.detail.link[linkLength]._attributes.remarks = detail.link.remarks;\n    new_cot.event.detail.link[linkLength]._attributes.production_time = detail.link.production_time;\n};\n//}\n\nif (url === true) {\n    msg.payload = new_cot\n    return msg;\n}  else {\n    msg.payload = cot_base;\n    return msg;\n}\n\n//msg.payload = new_cot;\nreturn msg;",
+            "outputs": 1,
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [],
+            "x": 310,
+            "y": 360,
+            "wires": [
+                [
+                    "0acbcc36d9ae2bfb"
+                ]
+            ]
+        },
+        {
+            "id": "32ff4bbb06221e33",
+            "type": "function",
+            "z": "70eb72484ca97dd5",
+            "name": "Check State",
+            "func": "const payload = msg.payload.trim();\n\n//Verify payload is a valid US State\nvar states = [\"AL\", \"AK\", \"AZ\", \"AR\", \"CA\", \"CO\", \"CT\", \"DE\", \"FL\", \"GA\", \"HI\", \"ID\", \"IL\", \"IN\", \"IA\", \"KS\", \"KY\", \"LA\", \"ME\", \"MD\", \"MA\", \"MI\", \"MN\", \"MS\", \"MO\", \"MT\", \"NE\", \"NV\", \"NH\", \"NJ\", \"NM\", \"NY\", \"NC\", \"ND\", \"OH\", \"OK\", \"OR\", \"PA\", \"RI\", \"SC\", \"SD\", \"TN\", \"TX\", \"UT\", \"VT\", \"VA\", \"WA\", \"WV\", \"WI\", \"WY\"];\n\n//URL if no state provided - downloads ALL TFRs\nconst noStateUrl = \"https://tfr.faa.gov/tfr2/list.jsp?type=all&sort=d&up=Y\";\n\nvar isState = states.includes(msg.payload.toUpperCase()); \nvar default_state = env.get(\"default_state\")\nif (payload !== undefined && payload !== null && payload !== \"\") {\n    var isState = states.includes(msg.payload.toUpperCase());\n    if (isState === true) {\n        var state = msg.payload.toUpperCase();\n        msg.url = 'https://tfr.faa.gov/tfr2/list.jsp?p=list&state='+state+'&type=all&sort=d&up=N';\n        return msg;\n    } else if (default_state !== undefined && default_state !== null && default_state !== \"\") {\n        state = default_state.toUpperCase();\n        msg.url = 'https://tfr.faa.gov/tfr2/list.jsp?p=list&state=' + state + '&type=all&sort=d&up=N';\n        return msg;\n    }\n} else if (default_state !== undefined && default_state !== null && default_state !== \"\") {\n    state = default_state.toUpperCase();\n    msg.url = 'https://tfr.faa.gov/tfr2/list.jsp?p=list&state=' + state + '&type=all&sort=d&up=N';\n    msg.method = \"GET\"\n    return msg;\n} else {\n    msg.url = noStateUrl;\n    return msg;\n};",
+            "outputs": 1,
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [],
+            "x": 230,
+            "y": 180,
+            "wires": [
+                [
+                    "58d5207abfdbe44d"
+                ]
+            ]
+        },
+        {
+            "id": "58d5207abfdbe44d",
+            "type": "http request",
+            "z": "70eb72484ca97dd5",
+            "name": "Get TFR List",
+            "method": "GET",
+            "ret": "txt",
+            "paytoqs": "body",
+            "url": "",
+            "tls": "",
+            "persist": false,
+            "proxy": "",
+            "insecureHTTPParser": false,
+            "authType": "",
+            "senderr": false,
+            "headers": [],
+            "x": 400,
+            "y": 180,
+            "wires": [
+                [
+                    "be1debb9ee1a67c5"
+                ]
+            ]
+        },
+        {
+            "id": "0acbcc36d9ae2bfb",
+            "type": "change",
+            "z": "70eb72484ca97dd5",
+            "name": "Clean Up",
+            "rules": [
+                {
+                    "t": "delete",
+                    "p": "url",
+                    "pt": "msg"
+                },
+                {
+                    "t": "delete",
+                    "p": "method",
+                    "pt": "msg"
+                },
+                {
+                    "t": "delete",
+                    "p": "statusCode",
+                    "pt": "msg"
+                },
+                {
+                    "t": "delete",
+                    "p": "headers",
+                    "pt": "msg"
+                },
+                {
+                    "t": "delete",
+                    "p": "responseUrl",
+                    "pt": "msg"
+                },
+                {
+                    "t": "delete",
+                    "p": "redirectList",
+                    "pt": "msg"
+                },
+                {
+                    "t": "delete",
+                    "p": "retry",
+                    "pt": "msg"
+                },
+                {
+                    "t": "delete",
+                    "p": "responseCookies",
+                    "pt": "msg"
+                },
+                {
+                    "t": "delete",
+                    "p": "linkPoints",
+                    "pt": "msg"
+                },
+                {
+                    "t": "delete",
+                    "p": "cot_detail",
+                    "pt": "msg"
+                },
+                {
+                    "t": "delete",
+                    "p": "topic",
+                    "pt": "msg"
+                },
+                {
+                    "t": "delete",
+                    "p": "type",
+                    "pt": "msg"
+                }
+            ],
+            "action": "",
+            "property": "",
+            "from": "",
+            "to": "",
+            "reg": false,
+            "x": 490,
+            "y": 360,
+            "wires": [
+                []
+            ]
+        },
+        {
+            "id": "be1debb9ee1a67c5",
+            "type": "switch",
+            "z": "70eb72484ca97dd5",
+            "name": "Check https statusCode",
+            "property": "statusCode",
+            "propertyType": "msg",
+            "rules": [
+                {
+                    "t": "eq",
+                    "v": "200",
+                    "vt": "str"
+                },
+                {
+                    "t": "else"
+                }
+            ],
+            "checkall": "true",
+            "repair": false,
+            "outputs": 2,
+            "x": 610,
+            "y": 180,
+            "wires": [
+                [
+                    "816b3b616d151b8e"
+                ],
+                []
+            ]
+        },
+        {
+            "id": "837fc8f45379f72a",
+            "type": "switch",
+            "z": "70eb72484ca97dd5",
+            "name": "Check https statusCode",
+            "property": "statusCode",
+            "propertyType": "msg",
+            "rules": [
+                {
+                    "t": "eq",
+                    "v": "200",
+                    "vt": "str"
+                },
+                {
+                    "t": "else"
+                }
+            ],
+            "checkall": "true",
+            "repair": false,
+            "outputs": 2,
+            "x": 1060,
+            "y": 240,
+            "wires": [
+                [
+                    "2268bb2949af523c"
+                ],
+                []
+            ]
+        }
     ]
 }

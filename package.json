@@ -31,7 +31,8 @@
   "homepage": "https://github.com/clptak/node-red-contrib-tfr2cot/tree/main#readme",
   "node-red": {
       "nodes": {
-          "cot2xtopo-node": "tfr2cot.js"
+          "tfr2cot-node": "tfr2cot.js",
+          "dataSyncSubscription":"dataSyncSubscription.js"
     }
   }
 }

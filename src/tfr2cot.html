@@ -219,3 +219,183 @@ limitations under the License.
         }
     </pre>
 </script>
+
+<script type="text/javascript">
+    RED.nodes.registerType("dataSyncSubscription",{
+        category: "location",
+        color: "#a6bbcf",
+        defaults: {
+            name: {value:"tfr2cot"}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "Data_Sync.png",
+        inputLabels: "msg.payload as a 2 letter string",
+        outputLabels: ["SA Message","http POST"],
+        label: function() {
+            return this.name||"dataSyncSubscription";
+        },
+        labelStyle: function () {
+            return this.name ? "node_label_italic" : "";
+          },
+    });
+</script>
+
+<script type="text/html" data-template-name="dataSyncSubscription">
+    <div class="form-row">
+      <label for="node-input-name">
+        <i class="fa fa-tag"></i>
+        <span data-i18n="node-red:common.label.name"></span>
+      </label>
+      <input type="text" id="node-input-name" data-i18n="node-red:[placeholder]common.label.name"/>
+    </div>
+  
+    <div class="form-row">
+      <label for="node-input-property">
+        <i class="fa fa-ellipsis-h"></i>
+        <span data-i18n="node-red:common.label.property"></span>
+      </label>
+      <input type="text" id="node-input-property" style="width:70%;" placeholder="payload"/>
+    </div>
+  
+    <hr align="middle" />
+  
+    <div class="form-row">
+      <label style="width:100%;">
+        <span data-i18n="node-red:xml.label.x2o"></span>
+      </label>
+    </div>
+  
+    <div class="form-row" style="padding-left: 20px;">
+      <label style="width:250px;" for="node-input-attr" data-i18n="node-red:xml.label.represent"></label>
+      <input type="text" id="node-input-attr" style="text-align:center; width:100px" placeholder="_attributes"/>
+    </div>
+  
+    <div class="form-row" style="padding-left: 20px;">
+      <label style="width:250px;" for="node-input-chr" data-i18n="node-red:xml.label.prefix"></label>
+      <input type="text" id="node-input-chr" style="text-align:center; width:40px" placeholder="_"/>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="dataSyncSubscription">
+    <h1>Summary</h1>
+    <p>if subjflow properties .creatorUid, .takMission,.takServerUrl, and .misionApiPort are not empty, the node sends a SA message to configured tcp out node and makes an http POST to a TAK Server to subscribe to a TAK Mission.</p>
+
+<h3>Input</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">string</span></dt>
+        <dd><code>msg.payload</code></dd>
+        <ul>
+            <li>
+                <code>msg.payload</code> with the following properties to override any defaults in the node / subflow properties:
+            </li>
+            <li>1. <code>.creatorUid</code>Name of TAK Server certificate.</li>
+            <li>2. <code>.takMission</code>DataSync Mission from TAK Server.</li>
+            <li>3. <code>.takServerUrl</code> The base url *(e.g. takserver.example.com)* or IP address *(e.g. 192.168.1.50)* of your TAK Server.  Do not include protocol tags:  Just the Fully Qualified Domain Name (FQDN) or IP address.</li>
+            <li>4. <code>.misionApiPort</code> If your TAK Server Mission API Port is different than the standard `8443`, include it in <code>msg.payload</code> or change it in the node properties.</li>
+            <li>5. <code>.lat</code> If you wish to display a location for your TAK Server Node-RED client, include it in <code>msg.payload</code> or change the default coordinates in the node properties.</li>
+            <li>6. <code>.lon</code> If you wish to display a location for your TAK Server Node-RED client, include it in <code>msg.payload</code> or change the default coordinates in the node properties.</li>
+            <li>7. <code>.team</code> Color PLI accepted in TAK.  If not in payload or in node properties, the default is "White."</li>
+            <li>8. <code>.role</code> Role for PLI accepted in TAK.  If not in payload or in node properties, the default is "Team Member".</li>
+        </ul>
+    </dl>
+    <h3>Outputs</h3>
+    This node hast 2 different outputs:
+    <ol>
+      <li>
+        <dl class="message-properties">
+          <dt>payload <span class="property-type">object | string</span></dt>
+          <dd>
+            <ul>
+              <li>
+                <code>msg.payload</code> containing an cursor-on-target (CoT) Situation Awareness (SA) / Position Location Information (PLI) message sent to configured <code>node-red-contrib-tak</code> and <code>tcp out</code> nodes
+              </li>
+            </ul>
+          </dd>
+        </dl>
+      </li>
+  
+      <li>
+        <dl class="message-properties">
+          <dt>payload <span class="property-type">buffer</span></dt>
+          <dd>CoT as Multicast Protobuf format.</dd>
+          <ul>
+            <li>
+                <code>msg.payload</code> to `http request` Node
+            </li>
+            <li>
+                <code>msg.url</code> Uses <code>.takServerUrl</code>, <code>.missionApiPort</code>, <code>.takMission</code>, and <code>creatorUid</code> from input or node properties.
+            </li>
+            <li>
+                <code>msg.header</code> Hard-coded
+            </li>
+            <li>
+                <code>msg.method</code> Hard-coded
+            </li>
+          </ul>
+        </dl>
+      </li>
+    </ol>
+    <h3>Details:</h3>
+        <h4>Example SA / CoT Message:</h4>
+        <pre>
+            {
+                "event": {
+                    "_attributes": {
+                        "version": "2.0",
+                        "uid": "[creatorUid]",
+                        "type": "m-g",
+                        "how": "a-f-A",
+                        "time": "2023-08-16T20:59:34.959Z",
+                        "start": "2023-08-16T20:59:34.959Z",
+                        "stale": "2023-08-16T21:09:34.959Z"
+                    },
+                    "point": {
+                        "_attributes": {
+                            "lat": 0,
+                            "lon": 0,
+                            "hae": "9999999.0",
+                            "ce": "9999999.0",
+                            "le": "9999999.0"
+                        }
+                    },
+                    "detail": {
+                        "__group": {
+                            "_attributes": {
+                                "name": "White",
+                                "role": "Team Member"
+                            }
+                        },
+                        "precisionlocation": {
+                            "_attributes": {
+                                "geopointsrc": "GPS",
+                                "altsrc": "GPS"
+                            }
+                        },
+                        "track": {
+                            "_attributes": {
+                                "course": "0.00000",
+                                "speed": "0.00000"
+                            }
+                        },
+                        "contact": {
+                            "_attributes": {
+                                "endpoint": "*:-1:stcp",
+                                "callsign": "[creatorUid]",
+                                "phone": ""
+                            }
+                        },
+                        "uid": {
+                            "_attributes": {
+                                "Droid": "[creatorUid]"
+                            }
+                        }
+                    }
+                }
+            }            
+        </pre>
+        <h4>Example Output <code>msg.url</code>:</h4>
+        <pre>
+            https://[takServerUrl]:[missionApiPort]/Marti/api/missions/[takMission]/subscription?uid=[creatorUid]
+        </pre>
+</script>
