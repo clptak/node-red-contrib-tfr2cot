@@ -71,6 +71,8 @@ For more information on how to set up the network and [`node-red-contrib-tak`](h
 2. Install using `npm`:  `npm i node-red-contrib-tfr2cot`
 3. Install in Node-RED admin site using the `Manage Palette` menu option, click on the `Install` tab, and search for `node-red-contrib-tfr2cot` in the search field, then click on the "Install" button.
 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/F8wrYstBHy)
+
 ## License & Copyright
 
 Copyright 2023 CLP Development, LLC
