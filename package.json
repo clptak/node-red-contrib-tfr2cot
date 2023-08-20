@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-tfr2cot",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "If msg.payload or env.state is a 2 letter U.S. abbreviation for a state, this node returns a msg.payload as JSON cursor-on-target (CoT) message for use with node-red-contrib-tak node and tcp out node.",
   "main": "index.js",
   "scripts": {
