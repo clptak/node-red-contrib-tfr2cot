@@ -67,9 +67,12 @@ This Node RED sub-flow pulls a list of current Federal Aviation Administration (
 For more information on how to set up the network and [`node-red-contrib-tak`](https://node-red-contrib-tak.readthedocs.io/en/latest/) nodes, see https://node-red-contrib-tak.readthedocs.io/en/latest/
 
 ## INSTALLATION:
-1. Import -> Paste the `./examples/node-red-contrib-tfr2cot_subflow.json` file into to Node-RED into the import dialog.
-2. Install using `npm`:  `npm i node-red-contrib-tfr2cot`
+1. Node RED Import (3 ways)
+   1. Paste the `./examples/node-red-contrib-tfr2cot_subflow.json` file into to Node-RED into the import dialog.
+   2. Import by file using the `node-red-contrib-tfr2cot-latest.tgz` from [Releases](https://github.com/clptak/node-red-contrib-tfr2cot/releases/)
+2. Install using `npm`:  `npm node-red-contrib-tfr2cot`
 3. Install in Node-RED admin site using the `Manage Palette` menu option, click on the `Install` tab, and search for `node-red-contrib-tfr2cot` in the search field, then click on the "Install" button.
+4. Install in Node-RED 
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/F8wrYstBHy)
 

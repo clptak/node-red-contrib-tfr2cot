@@ -1,0 +1,586 @@
+<!--
+/* tfr2cot Node-RED Nodes.
+
+Copyright 2023 CLP Development, LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/* jslint node: true */
+/* jslint white: true */
+-->
+
+<script type="text/javascript">
+    RED.nodes.registerType("tfr2cot",{
+        category: "location",
+        color: "#a6bbcf",
+        defaults: {
+            name: {value:"tfr2cot"}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "plane.png",
+        inputLabels: "msg.payload as a 2 letter string",
+        outputLabels: ["CoT JSON"],
+        label: function() {
+            return this.name||"tfr2cot";
+        },
+        labelStyle: function () {
+            return this.name ? "node_label_italic" : "";
+          },
+    });
+</script>
+
+<script type="text/html" data-template-name="tfr2cot">
+  <div class="form-row">
+    <label for="node-input-name">
+      <i class="fa fa-tag"></i>
+      <span data-i18n="node-red:common.label.name"></span>
+    </label>
+    <input type="text" id="node-input-name" data-i18n="node-red:[placeholder]common.label.name"/>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-property">
+      <i class="fa fa-ellipsis-h"></i>
+      <span data-i18n="node-red:common.label.property"></span>
+    </label>
+    <input type="text" id="node-input-property" style="width:70%;" placeholder="payload"/>
+  </div>
+
+  <hr align="middle" />
+
+  <div class="form-row">
+    <label style="width:100%;">
+      <span data-i18n="node-red:xml.label.x2o"></span>
+    </label>
+  </div>
+
+  <div class="form-row" style="padding-left: 20px;">
+    <label style="width:250px;" for="node-input-attr" data-i18n="node-red:xml.label.represent"></label>
+    <input type="text" id="node-input-attr" style="text-align:center; width:100px" placeholder="_attributes"/>
+  </div>
+
+  <div class="form-row" style="padding-left: 20px;">
+    <label style="width:250px;" for="node-input-chr" data-i18n="node-red:xml.label.prefix"></label>
+    <input type="text" id="node-input-chr" style="text-align:center; width:40px" placeholder="_"/>
+  </div>
+</script>
+
+<script type="text/markdown" data-help-name="tfr2cot">
+Retrieves Temporary Flight Restriction (TFR) data from the FAA TFR website <a href="https://tfr.faa.gov/tfr2/list.html">FAA</a> and parses the xml data to create a <a href="https://www.tak.gov">Team Awareness Kit (TAK)</a> Cursor-on-Target (CoT) polygon message to share across a TAK network or WinTAK instance if running on MS Windows. 
+
+### properties
+The `default_state` field is the default state if you set an `inject` node to recur at a desired interval.
+If `msg.payload` or `env.state` is a 2 letter U.S. abbreviation for a state, this node returns a `msg.payload` as JSON cursor-on-target (CoT) message for use with `node-red-contrib-tak` node and tcp out node.
+
+### INPUT
+: payload (string) : contains a 2-letter abbreviation for the desired U.S. state.  If no message or if `msg.payload` is a blank, all TFRs will be downloaded.
+
+### OUTPUTS
+1. Standard Output
+: payload (json) : contains a JSON CoT message and should be passed to a `node-red-contrib-tak` node followed by a `tcp out` node with the appropriate network configuration for your set up.  See `node-red-contrib-tak` [documentation](https://node-red-contrib-tak.readthedocs.io/en/latest/) for further details.
+
+2. [TAK Server](https:///tak.gov) DataSync Outputs (Optional)
+: payload (json) :  a json object with the CoT UID sent to the TAK Server in Output #1
+: url (string) :  Contains the http PUSH url using the `.takServerUrl` and `.missionApiPort` (typically `8443`).  It will not send anything if these properties are left blank.
+: header (json) :  Contans the header needed to interact with the TAK Server API.
+: method (string):  `PUT` to pass the cotUid to DataSync to include the CoT message sent out in Output #1.
+
+    4 Messages are pushed if you are sending your CoT messages to a specific DataSync Mission:
+
+    > NOTE that prior to these messages going out, you need to be sending an SA Message along with subscribing to that mission.  You also need an `http request` node properly configured as the recipient of these messages. Please See the `DataSync Subscription` and `http request` node configuration for more.
+
+    > *If any of the properties: `.creatorUid`, `.takServerUrl`, `.takMission` are empty and/or the `.missionApiPort` is not set correctly (it is set to 8443 by default), there will be no message from Output #2.
+
+3. Debug Node (beta) to determine parsing errors.
+
+### DETAILS
+**Example JSON CoT message:**
+```json
+{
+    "event": {
+        "_attributes": {
+            "version": "2.0",
+            "uid": "10c46aff-3007-439a-9ee1-fc5ca256395b",
+            "type": "u-d-f",
+            "how": "h-e",
+            "time": "2023-08-15T10:35:21.131Z",
+            "start": "2023-08-15T10:35:21.131Z",
+            "stale": "2023-08-15T10:55:21.131Z"
+        },
+        "point": {
+            "_attributes": {
+                "lat": "39.13416667",
+                "lon": "-121.4375",
+                "hae": "9999999.0",
+                "ce": "9999999.0",
+                "le": "9999999.0"
+            }
+        },
+        "detail": {
+            "strokeColor": [
+                {
+                    "_attributes": {
+                        "value": "-65536"
+                    }
+                }
+            ],
+            "strokeWeight": [
+                {
+                    "_attributes": {
+                        "value": "1.0"
+                    }
+                }
+            ],
+            "fillColor": [
+                {
+                    "_attributes": {}
+                }
+            ],
+            "contact": [
+                {
+                    "_attributes": {
+                        "callsign": "tfr-3-3868"
+                    }
+                }
+            ],
+            "remarks": "!FDC 3/3868 ZOA CA..AIRSPACE BEALE AFB, CA..TEMPORARY FLIGHT RESTRICTIONS. AUGUST 16-NOVEMBER 5, 2023 LOCAL. PURSUANT TO 49 USC 40103(B)(3), THE FEDERAL AVIATION ADMINISTRATION (FAA) CLASSIFIES THE AIRSPACE DEFINED IN THIS NOTAM AS 'NTL DEFENSE AIRSPACE'. ANY PERSON WHO KNOWINGLY OR WILLFULLY VIOLATES THE RULES CONCERNING OPS IN THIS AIRSPACE MAY BE SUBJECT TO CERTAIN CRIMINAL PENALTIES UNDER 49 USC 40103(B)(3). PILOTS WHO DO NOT ADHERE TO THE FOLLOWING PROC MAY BE INTERCEPTED, DETAINED AND INTERVIEWED BY LAW ENFORCEMENT/SECURITY PERSONNEL. \nPURSUANT TO 14 CFR 99.7, SPECIAL SECURITY INSTRUCTIONS, ALL ACFT FLT OPS ARE PROHIBITED: WI AN AREA DEFINED AS 10NM RADIUS OF 390803N1212615W (MYV055006.7) 4100FT MSL-FL180 EFFECTIVE 2308162200 UTC (1500 LOCAL 08/16/23) UNTIL 2311050859 UTC (0159 LOCAL 11/05/23). EXC AS SPECIFIED BLW AND/OR UNLESS AUTH BY ATC: 1. ALL AIRCRAFT ENTERING OR EXITING THE TFR MUST BE ON A DISCRETE CODE ASSIGNED BY AN AIR TRAFFIC CONTROL (ATC) FACILITY. 2. AIRCRAFT MUST B...",
+            "archive": "",
+            "labels_on": [
+                {
+                    "_attributes": {
+                        "value": "true"
+                    }
+                }
+            ],
+            "precisionlocation": [
+                {
+                    "_attributes": {
+                        "altsrc": "???"
+                    }
+                }
+            ],
+            "color": [
+                {
+                    "_attributes": {
+                        "argb": "-65536"
+                    }
+                }
+            ],
+            "height": [
+                {
+                    "_attributes": {
+                        "value": "54.864000000000004"
+                    }
+                }
+            ],
+            "_geofence": [
+                {
+                    "_attributes": {
+                        "elevationMonitored": "true",
+                        "minElevation": "0.0",
+                        "monitor": "All",
+                        "trigger": "Both",
+                        "tracking": "false",
+                        "maxElevation": "54.864000000000004",
+                        "boundingSphere": "96000.0"
+                    }
+                }
+            ],
+            "link": [
+                {
+                    "_attributes": {
+                        "point": "39.30098401,-121.4375"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.29844376,-121.4002184"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.29090073,-121.36407744"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.27858565,-121.33018217"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.26187506,-121.29956756"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.24127959,-121.27316653"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.21742807,-121.25178121"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.19104811,-121.23605861"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.16294355,-121.22647129"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.13396987,-121.22330366"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.1050079,-121.22664414"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.07693711,-121.23638347"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.05060886,-121.25221889"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.0268208,-121.27366425"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.00629284,-121.30006528"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "38.9896457,-121.33061985"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "38.97738234,-121.36440231"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "38.96987307,-121.40039125"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "38.96734455,-121.4375"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "38.96987307,-121.47460875"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "38.97738234,-121.51059769"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "38.9896457,-121.54438015"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.00629284,-121.57493472"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.0268208,-121.60133575"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.05060886,-121.62278111"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.07693711,-121.63861653"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.1050079,-121.64835586"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.13396987,-121.65169634"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.16294355,-121.64852871"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.19104811,-121.63894139"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.21742807,-121.62321879"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.24127959,-121.60183347"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.26187506,-121.57543244"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.27858565,-121.54481783"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.29090073,-121.51092256"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.29844376,-121.4747816"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "point": "39.30098401,-121.4375"
+                    }
+                },
+                {
+                    "_attributes": {
+                        "url": "https://tfr.faa.gov/save_pages/detail_3_3868.html",
+                        "type": "",
+                        "remarks": null,
+                        "relation": "r-u",
+                        "mime": "text/html",
+                        "version": "1.0",
+                        "production_time": ""
+                    }
+                }
+            ]
+        }
+    }
+}
+```
+### References
+ 1. [node-red-contrib-tak]():  Documentation for installing `node-red-contrib-tak` node with additional information to configure `tcp out` nodes to pass CoT messages to a [TAK Server](https://tak.gov) or network.
+ 2. [Team Awareness Kit](https://tak.gov): To learn more of the Team Awareness Kit (TAK) situational awareness platform.
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType("dataSyncSubscription",{
+        category: "location",
+        color: "#a6bbcf",
+        defaults: {
+            name: {value:"tfr2cot"}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "Data_Sync.png",
+        inputLabels: "msg.payload as a 2 letter string",
+        outputLabels: ["SA Message","http POST"],
+        label: function() {
+            return this.name||"dataSyncSubscription";
+        },
+        labelStyle: function () {
+            return this.name ? "node_label_italic" : "";
+          },
+    });
+</script>
+
+<script type="text/html" data-template-name="dataSyncSubscription">
+    <div class="form-row">
+      <label for="node-input-name">
+        <i class="fa fa-tag"></i>
+        <span data-i18n="node-red:common.label.name"></span>
+      </label>
+      <input type="text" id="node-input-name" data-i18n="node-red:[placeholder]common.label.name"/>
+    </div>
+  
+    <div class="form-row">
+      <label for="node-input-property">
+        <i class="fa fa-ellipsis-h"></i>
+        <span data-i18n="node-red:common.label.property"></span>
+      </label>
+      <input type="text" id="node-input-property" style="width:70%;" placeholder="payload"/>
+    </div>
+  
+    <hr align="middle" />
+  
+    <div class="form-row">
+      <label style="width:100%;">
+        <span data-i18n="node-red:xml.label.x2o"></span>
+      </label>
+    </div>
+  
+    <div class="form-row" style="padding-left: 20px;">
+      <label style="width:250px;" for="node-input-attr" data-i18n="node-red:xml.label.represent"></label>
+      <input type="text" id="node-input-attr" style="text-align:center; width:100px" placeholder="_attributes"/>
+    </div>
+  
+    <div class="form-row" style="padding-left: 20px;">
+      <label style="width:250px;" for="node-input-chr" data-i18n="node-red:xml.label.prefix"></label>
+      <input type="text" id="node-input-chr" style="text-align:center; width:40px" placeholder="_"/>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="dataSyncSubscription">
+    <h1>Summary</h1>
+    <p>if subjflow properties .creatorUid, .takMission,.takServerUrl, and .misionApiPort are not empty, the node sends a SA message to configured tcp out node and makes an http POST to a TAK Server to subscribe to a TAK Mission.</p>
+
+<h3>Input</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">string</span></dt>
+        <dd><code>msg.payload</code></dd>
+        <ul>
+            <li>
+                <code>msg.payload</code> with the following properties to override any defaults in the node / subflow properties:
+            </li>
+            <li>1. <code>.creatorUid</code>Name of TAK Server certificate.</li>
+            <li>2. <code>.takMission</code>DataSync Mission from TAK Server.</li>
+            <li>3. <code>.takServerUrl</code> The base url *(e.g. takserver.example.com)* or IP address *(e.g. 192.168.1.50)* of your TAK Server.  Do not include protocol tags:  Just the Fully Qualified Domain Name (FQDN) or IP address.</li>
+            <li>4. <code>.misionApiPort</code> If your TAK Server Mission API Port is different than the standard `8443`, include it in <code>msg.payload</code> or change it in the node properties.</li>
+            <li>5. <code>.lat</code> If you wish to display a location for your TAK Server Node-RED client, include it in <code>msg.payload</code> or change the default coordinates in the node properties.</li>
+            <li>6. <code>.lon</code> If you wish to display a location for your TAK Server Node-RED client, include it in <code>msg.payload</code> or change the default coordinates in the node properties.</li>
+            <li>7. <code>.team</code> Color PLI accepted in TAK.  If not in payload or in node properties, the default is "White."</li>
+            <li>8. <code>.role</code> Role for PLI accepted in TAK.  If not in payload or in node properties, the default is "Team Member".</li>
+        </ul>
+    </dl>
+    <h3>Outputs</h3>
+    This node hast 2 different outputs:
+    <ol>
+      <li>
+        <dl class="message-properties">
+          <dt>payload <span class="property-type">object | string</span></dt>
+          <dd>
+            <ul>
+              <li>
+                <code>msg.payload</code> containing an cursor-on-target (CoT) Situation Awareness (SA) / Position Location Information (PLI) message sent to configured <code>node-red-contrib-tak</code> and <code>tcp out</code> nodes
+              </li>
+            </ul>
+          </dd>
+        </dl>
+      </li>
+  
+      <li>
+        <dl class="message-properties">
+          <dt>payload <span class="property-type">buffer</span></dt>
+          <dd>CoT as Multicast Protobuf format.</dd>
+          <ul>
+            <li>
+                <code>msg.payload</code> to `http request` Node
+            </li>
+            <li>
+                <code>msg.url</code> Uses <code>.takServerUrl</code>, <code>.missionApiPort</code>, <code>.takMission</code>, and <code>creatorUid</code> from input or node properties.
+            </li>
+            <li>
+                <code>msg.header</code> Hard-coded
+            </li>
+            <li>
+                <code>msg.method</code> Hard-coded
+            </li>
+          </ul>
+        </dl>
+      </li>
+    </ol>
+    <h3>Details:</h3>
+        <h4>Example SA / CoT Message:</h4>
+        <pre>
+            {
+                "event": {
+                    "_attributes": {
+                        "version": "2.0",
+                        "uid": "[creatorUid]",
+                        "type": "m-g",
+                        "how": "a-f-A",
+                        "time": "2023-08-16T20:59:34.959Z",
+                        "start": "2023-08-16T20:59:34.959Z",
+                        "stale": "2023-08-16T21:09:34.959Z"
+                    },
+                    "point": {
+                        "_attributes": {
+                            "lat": 0,
+                            "lon": 0,
+                            "hae": "9999999.0",
+                            "ce": "9999999.0",
+                            "le": "9999999.0"
+                        }
+                    },
+                    "detail": {
+                        "__group": {
+                            "_attributes": {
+                                "name": "White",
+                                "role": "Team Member"
+                            }
+                        },
+                        "precisionlocation": {
+                            "_attributes": {
+                                "geopointsrc": "GPS",
+                                "altsrc": "GPS"
+                            }
+                        },
+                        "track": {
+                            "_attributes": {
+                                "course": "0.00000",
+                                "speed": "0.00000"
+                            }
+                        },
+                        "contact": {
+                            "_attributes": {
+                                "endpoint": "*:-1:stcp",
+                                "callsign": "[creatorUid]",
+                                "phone": ""
+                            }
+                        },
+                        "uid": {
+                            "_attributes": {
+                                "Droid": "[creatorUid]"
+                            }
+                        }
+                    }
+                }
+            }            
+        </pre>
+        <h4>Example Output <code>msg.url</code>:</h4>
+        <pre>
+            https://[takServerUrl]:[missionApiPort]/Marti/api/missions/[takMission]/subscription?uid=[creatorUid]
+        </pre>
+</script>

@@ -1,0 +1,417 @@
+{
+    "id": "e56e75040e1956a3",
+    "type": "subflow",
+    "name": "dataSyncSubscription",
+    "info": "# Summary\nif subjflow properties .creatorUid, .takMission,.takServerUrl, and .misionApiPort are not empty, the node sends a SA message to configured tcp out node and makes an http POST to a TAK Server to subscribe to a TAK Mission.\n\n### Input \n<code>msg.payload</code> with the following properties to override any defaults in the node / subflow properties:\n 1. <code>.creatorUid</code>Name of TAK Server certificate.\n 2. <code>.takMission</code>DataSync Mission from TAK Server.\n 3. <code>.takServerUrl</code> The base url *(e.g. takserver.example.com)* or IP address *(e.g. 192.168.1.50)* of your TAK Server.  Do not include protocol tags:  Just the Fully Qualified Domain Name (FQDN) or IP address.\n 4. <code>.misionApiPort</code> If your TAK Server Mission API Port is different than the standard `8443`, include it in <code>msg.payload</code> or change it in the node properties.\n 5. <code>.lat</code> If you wish to display a location for your TAK Server Node-RED client, include it in <code>msg.payload</code> or change the default coordinates in the node properties.\n 6. <code>.lon</code> If you wish to display a location for your TAK Server Node-RED client, include it in <code>msg.payload</code> or change the default coordinates in the node properties.\n 7. <code>.team</code> Color PLI accepted in TAK.  If not in payload or in node properties, the default is \"White.\"\n 8. <code>.role</code> Role for PLI accepted in TAK.  If not in payload or in node properties, the default is \"Team Member\".\n\n### Outputs:\n### 1. <code>msg.payload</code> SA / PLI CoT Message\n 1. <code>msg.payload</code> containing an cursor-on-target (CoT) Situation Awareness (SA) / Position Location Information (PLI) message sent to configured <code>node-red-contrib-tak</code> and <code>tcp out</code> nodes.\n ### Example SA / CoT Message:\n ```json\n{\n    \"event\": {\n        \"_attributes\": {\n            \"version\": \"2.0\",\n            \"uid\": \"[creatorUid]\",\n            \"type\": \"m-g\",\n            \"how\": \"a-f-A\",\n            \"time\": \"2023-08-16T20:59:34.959Z\",\n            \"start\": \"2023-08-16T20:59:34.959Z\",\n            \"stale\": \"2023-08-16T21:09:34.959Z\"\n        },\n        \"point\": {\n            \"_attributes\": {\n                \"lat\": 0,\n                \"lon\": 0,\n                \"hae\": \"9999999.0\",\n                \"ce\": \"9999999.0\",\n                \"le\": \"9999999.0\"\n            }\n        },\n        \"detail\": {\n            \"__group\": {\n                \"_attributes\": {\n                    \"name\": \"White\",\n                    \"role\": \"Team Member\"\n                }\n            },\n            \"precisionlocation\": {\n                \"_attributes\": {\n                    \"geopointsrc\": \"GPS\",\n                    \"altsrc\": \"GPS\"\n                }\n            },\n            \"track\": {\n                \"_attributes\": {\n                    \"course\": \"0.00000\",\n                    \"speed\": \"0.00000\"\n                }\n            },\n            \"contact\": {\n                \"_attributes\": {\n                    \"endpoint\": \"*:-1:stcp\",\n                    \"callsign\": \"[creatorUid]\",\n                    \"phone\": \"\"\n                }\n            },\n            \"uid\": {\n                \"_attributes\": {\n                    \"Droid\": \"[creatorUid]\"\n                }\n            }\n        }\n    }\n}\n ```\n\n### 2. <code>msg.payload</code> to `http request` Node\n 1. <code>msg.url</code> Uses <code>.takServerUrl</code>, <code>.missionApiPort</code>, <code>.takMission</code>, and <code>creatorUid</code> from input or node properties.\n 2. <code>msg.header</code> Hard-coded\n 3. <code>msg.method</code> Hard-coded\n\n ### Example <code>msg.url</code>\n ```\n https://[takServerUrl]:[missionApiPort]/Marti/api/missions/[takMission]/subscription?uid=[creatorUid]\n ```",
+    "category": "",
+    "in": [
+        {
+            "x": 430,
+            "y": 90,
+            "wires": [
+                {
+                    "id": "8304bdfba0b024fb"
+                }
+            ]
+        }
+    ],
+    "out": [
+        {
+            "x": 1180,
+            "y": 90,
+            "wires": [
+                {
+                    "id": "ef99cb3e72c182d4",
+                    "port": 0
+                }
+            ]
+        },
+        {
+            "x": 1000,
+            "y": 210,
+            "wires": [
+                {
+                    "id": "69b92724a91809d6",
+                    "port": 0
+                }
+            ]
+        }
+    ],
+    "env": [
+        {
+            "name": "creatorUid",
+            "type": "str",
+            "value": "",
+            "ui": {
+                "label": {
+                    "en-US": "TAK Cert Name"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "str"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "takMission",
+            "type": "str",
+            "value": "",
+            "ui": {
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "str"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "takServerUrl",
+            "type": "str",
+            "value": "",
+            "ui": {
+                "label": {
+                    "en-US": "TAK Server URL"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "str"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "missionApiPort",
+            "type": "num",
+            "value": "8443",
+            "ui": {
+                "label": {
+                    "en-US": "TAK Server API Port"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "num"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "lat",
+            "type": "num",
+            "value": "0.0",
+            "ui": {
+                "label": {
+                    "en-US": "PLI Latitude"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "num"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "lon",
+            "type": "num",
+            "value": "0.0",
+            "ui": {
+                "label": {
+                    "en-US": "PLI Longitude"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "num"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "team",
+            "type": "str",
+            "value": "White",
+            "ui": {
+                "label": {
+                    "en-US": "PLI Team / Color"
+                },
+                "type": "select",
+                "opts": {
+                    "opts": [
+                        {
+                            "l": {
+                                "en-US": "White"
+                            },
+                            "v": "White"
+                        },
+                        {
+                            "l": {
+                                "en-US": "Black"
+                            },
+                            "v": "Black"
+                        },
+                        {
+                            "l": {
+                                "en-US": "Blue"
+                            },
+                            "v": "Blue"
+                        },
+                        {
+                            "l": {
+                                "en-US": "Green"
+                            },
+                            "v": "Green"
+                        },
+                        {
+                            "l": {
+                                "en-US": "Yellow"
+                            },
+                            "v": "Yello"
+                        },
+                        {
+                            "l": {
+                                "en-US": "Orange"
+                            },
+                            "v": "Orange"
+                        },
+                        {
+                            "l": {
+                                "en-US": "Magenta"
+                            },
+                            "v": "Magenta"
+                        },
+                        {
+                            "l": {
+                                "en-US": "Cyan"
+                            },
+                            "v": "Cyan"
+                        },
+                        {
+                            "l": {
+                                "en-US": "Red"
+                            },
+                            "v": "Red"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "role",
+            "type": "str",
+            "value": "Team Member",
+            "ui": {
+                "label": {
+                    "en-US": "PLI Role"
+                },
+                "type": "select",
+                "opts": {
+                    "opts": [
+                        {
+                            "l": {
+                                "en-US": "Team Member"
+                            },
+                            "v": "Team Member"
+                        },
+                        {
+                            "l": {
+                                "en-US": "Team Leader"
+                            },
+                            "v": "Team Leader"
+                        },
+                        {
+                            "l": {
+                                "en-US": "HQ"
+                            },
+                            "v": "HQ"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "meta": {
+        "module": "tfr2cot",
+        "type": "network",
+        "version": "1.0.0",
+        "author": "Paul Clifton <paul.clifton@clptak.com>",
+        "desc": "if msg.payload contains properties .creatorUid, .takMission,.takServerUrl, and .misionApiPort,the node sends a SA message to configured tcp out node and makes an http POST to a TAK Server to subscribe to a TAK Mission",
+        "keywords": "tak-server,tak,sa,datasync,mission-api",
+        "license": "Apache-2.0"
+    },
+    "color": "#AAAA66",
+    "inputLabels": [
+        "msg.payload (JSON)"
+    ],
+    "outputLabels": [
+        "SA Message",
+        "http POST"
+    ],
+    "icon": "Data_Sync.png",
+    "flow": [
+        {
+            "id": "7d34f959e171aa0a",
+            "type": "function",
+            "z": "e56e75040e1956a3",
+            "name": "cot_detail_PLI",
+            "func": "// check payload\nconst payload = msg.payload;\nconst diez = 10 * 60 * 1000;\nconst stale = new Date(Date.now() + diez).toISOString();\nconst cot_base = {\n    \"event\": {\n        \"_attributes\": {\n            \"version\": \"2.0\",\n            \"uid\": \"\",\n            \"type\": \"m-g\",\n            \"how\": \"a-f-A\",\n            \"time\": new Date(Date.now()).toISOString(),\n            \"start\": new Date(Date.now()).toISOString(),\n            \"stale\": stale,\n        },\n        \"point\": {\n            \"_attributes\": {\n                \"lat\": \"0.0\",\n                \"lon\": \"0.0\",\n                \"hae\": \"9999999.0\",\n                \"ce\": \"9999999.0\",\n                \"le\": \"9999999.0\",\n            }\n        },\n        \"detail\": {\n        }\n    }\n}\n\n//var uid = msg.payload.event._attributes.uid;\nlet creatorUid = env.get(\"creatorUid\");\nlet lat = env.get(\"lat\");\nlet lon = env.get(\"lon\");\nlet name = env.get(\"team\");\nlet role = env.get(\"role\")\nif (creatorUid !== \"\") {\n    let detail_pli = {\"__group\": {\n        \"_attributes\": {\n            \"name\": name,\n                \"role\": role,\n            }\n        },\n        \"precisionlocation\": {\n            \"_attributes\": {\n                \"geopointsrc\": \"GPS\",\n                    \"altsrc\": \"GPS\",\n            }\n        },\n        \"track\": {\n            \"_attributes\": {\n                \"course\": \"0.00000\",\n                \"speed\": \"0.00000\",\n            }\n        },\n        \"contact\": {\n            \"_attributes\": {\n                \"endpoint\": \"*:-1:stcp\",\n                    \"callsign\": creatorUid,\n                    \"phone\": \"\",\n            }\n        },\n        \"uid\": {\n            \"_attributes\": {\n                \"Droid\": creatorUid,\n            }\n        }\n    } \ncot_base.event._attributes.uid = creatorUid;\ncot_base.event.point._attributes.lat = lat;\ncot_base.event.point._attributes.lon = lon;\ncot_base.event.detail = detail_pli;\nmsg.payload = cot_base;\n//msg.payload.detail = detail;\n/*\nif (payload.takMission !== undefined && payload.takMission !== \"\") {\n    if (payload.creatorUid !== undefined && payload.creatorUid !==\"\") {\n        takMissionStatus = true;\n    } else if (env.get(\"takMission\")!== \"\") {\n        takMissionStatus = true;\n    }\n    } else if (env.get(\"takMission\") !== \"\") {\n        if (payload.creatorUid) {\n            takMissionStatus = true;\n        } else if (env.get(\"takMission\") !== \"\") {\n            takMissionStatus = true;\n        }\n    } else {\n        takMissionStatus = false\n};\n*/\nmsg.takInfo = payload;\nmsg.sendToDataSync = true;//takMissionStatus;\nreturn msg;}",
+            "outputs": 1,
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [],
+            "x": 770,
+            "y": 90,
+            "wires": [
+                [
+                    "ef99cb3e72c182d4"
+                ]
+            ]
+        },
+        {
+            "id": "ef99cb3e72c182d4",
+            "type": "change",
+            "z": "e56e75040e1956a3",
+            "name": "Clean Up",
+            "rules": [],
+            "action": "",
+            "property": "",
+            "from": "",
+            "to": "",
+            "reg": false,
+            "x": 960,
+            "y": 90,
+            "wires": [
+                [
+                    "58853f4198a50862"
+                ]
+            ]
+        },
+        {
+            "id": "69b92724a91809d6",
+            "type": "function",
+            "z": "e56e75040e1956a3",
+            "name": "Subscribe to Mission (Mission API)",
+            "func": "let takMission = env.get(\"takMission\");\nlet creatorUid = env.get(\"creatorUid\");\nlet takServerUrl = env.get(\"takServerUrl\");\nlet missionApiPort = env.get(\"missionApiPort\");\n//const baseSubscriptionUrl https://tak.ccsosar.net:8443/Marti/api/missions/{{takMission}}/subscription?uid={{creatorUid}}\nif (takMission !== \"\" && creatorUid !== \"\" && takServerUrl !== \"\" && missionApiPort !== \"\"){\n    msg.url = \"https://\"+takServerUrl+\":\"+missionApiPort.toString()+\"/Marti/api/missions/\"+takMission+\"/subscription?uid=\"+creatorUid;\n    msg.header = {\n        \"accept\": \"*/*\",\n        \"Content-Type\": \"application/json\"\n    };\n    msg.method = \"PUT\";\n    return msg;\n} else {\n    msg.message = \"Yea....  your if statement is fucked\";\n    return msg;\n}\n",
+            "outputs": 1,
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [],
+            "x": 740,
+            "y": 210,
+            "wires": [
+                []
+            ]
+        },
+        {
+            "id": "ed4bb157aafb0c9b",
+            "type": "function",
+            "z": "e56e75040e1956a3",
+            "name": "Check TAK Server URL",
+            "func": "/*const payload = msg.takInfo;\nvar takMissionStatus = msg.takMissionStatus;\nif (payload.takServerUrl) {\n    takMissionStatus = true;\n} else if (env.get(\"takServerUrl\") !== \"\") {\n    takMissionStatus = true;\n} else {\n    takMissionStatus = false\n};\nmsg.sendToDataSync = takMissionStatus;*/\nreturn msg;",
+            "outputs": 1,
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [],
+            "x": 820,
+            "y": 150,
+            "wires": [
+                [
+                    "0d56b8c1896cb09d"
+                ]
+            ]
+        },
+        {
+            "id": "58853f4198a50862",
+            "type": "switch",
+            "z": "e56e75040e1956a3",
+            "name": "",
+            "property": "sendToDataSync",
+            "propertyType": "msg",
+            "rules": [
+                {
+                    "t": "false"
+                },
+                {
+                    "t": "true"
+                }
+            ],
+            "checkall": "true",
+            "repair": false,
+            "outputs": 2,
+            "x": 610,
+            "y": 150,
+            "wires": [
+                [],
+                [
+                    "ed4bb157aafb0c9b"
+                ]
+            ]
+        },
+        {
+            "id": "0d56b8c1896cb09d",
+            "type": "switch",
+            "z": "e56e75040e1956a3",
+            "name": "",
+            "property": "sendToDataSync",
+            "propertyType": "msg",
+            "rules": [
+                {
+                    "t": "else"
+                },
+                {
+                    "t": "true"
+                }
+            ],
+            "checkall": "true",
+            "repair": false,
+            "outputs": 2,
+            "x": 1000,
+            "y": 150,
+            "wires": [
+                [],
+                [
+                    "69b92724a91809d6"
+                ]
+            ]
+        },
+        {
+            "id": "8304bdfba0b024fb",
+            "type": "change",
+            "z": "e56e75040e1956a3",
+            "name": "",
+            "rules": [
+                {
+                    "t": "set",
+                    "p": "payload",
+                    "pt": "msg",
+                    "to": "takInfo",
+                    "tot": "msg"
+                },
+                {
+                    "t": "delete",
+                    "p": "payload",
+                    "pt": "msg"
+                }
+            ],
+            "action": "",
+            "property": "",
+            "from": "",
+            "to": "",
+            "reg": false,
+            "x": 580,
+            "y": 90,
+            "wires": [
+                [
+                    "7d34f959e171aa0a"
+                ]
+            ]
+        }
+    ]
+}
