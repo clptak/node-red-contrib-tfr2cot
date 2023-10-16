@@ -165,7 +165,7 @@
         "keywords": "tak,atak,itak,tak-server,tfr,faa,cot",
         "license": "Apache-2.0"
     },
-    "color": "#C0DEED",
+    "color": "#DDAA99",
     "inputLabels": [
         "msg.paylaod (string)"
     ],
@@ -174,7 +174,7 @@
         "mission subscription",
         "Debug"
     ],
-    "icon": "font-awesome/fa-plane",
+    "icon": "nofly.png",
     "flow": [
         {
             "id": "816b3b616d151b8e",
