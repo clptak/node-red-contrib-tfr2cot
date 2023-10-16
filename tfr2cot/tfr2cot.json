@@ -2,7 +2,7 @@
     "id": "70eb72484ca97dd5",
     "type": "subflow",
     "name": "tfr2cot",
-    "info": "# Summary\nIf <code>msg.payload</code> or <code>env.state</code> is a 2 letter U.S. abbreviation for a state, this node returns a <code>msg.payload</code> as JSON cursor-on-target (CoT) message for use with <code>node-red-contrib-tak</code> node and tcp out node.\n\n### INPUT\n<code>msg.payload</code> contains a 2-letter abbreviation for the desired U.S. state.  If no message or if <code>msg.payload</code> is a blank, all TFRs will be downloaded.\n\n### OUTPUTS\n 1. <code>msg.payload</code>contains a JSON CoT message and should be passed to a <code>node-red-contrib-tak</code> node followed by a <code>tcp out</code> node with the appropriate network configuration for your set up.  See <code>node-red-contrib-tak</code> [documentation](https://node-red-contrib-tak.readthedocs.io/en/latest/) for further details.\n 2. 4 Messages are pushed if you are sending your CoT messages to a specific DataSync Mission:\n > NOTE that prior to these messages going out, you need to be sending an SA Message along with subscribing to that mission.  You also need an <code>http request</code> node properly configured as the recipient of these messages. Please See the <code>DataSync Subscription</code> and <code>http request</code> node configuration for more.\n - <code>msg.payload</code>: a json object with the CoT UID sent to the TAK Server in Output #1\n - <code>msg.url</code>: Contains the http PUSH url using the <code>.takServerUrl</code> and <code>.missionApiPort</code> (typically `8443`).  It will not send anything if these properties are left blank.\n - <code>msg.header</code>: Contans the header needed to interact with the TAK Server API.\n - <code>msg.method</code>: `PUT` to pass the cotUid to DataSync to include the CoT message sent out in Output #1.\n3. Debug Node (beta) to determine parsing errors.\n > *If any of the properties: `.creatorUid`, `.takServerUrl`, `.takMission` are empty and/or the `.missionApiPort` is not set correctly (it is set to 8443 by default), there will be no message from Output #2.\n\n## Example JSON CoT message:\n```json\n{\n    \"event\": {\n        \"_attributes\": {\n            \"version\": \"2.0\",\n            \"uid\": \"10c46aff-3007-439a-9ee1-fc5ca256395b\",\n            \"type\": \"u-d-f\",\n            \"how\": \"h-e\",\n            \"time\": \"2023-08-15T10:35:21.131Z\",\n            \"start\": \"2023-08-15T10:35:21.131Z\",\n            \"stale\": \"2023-08-15T10:55:21.131Z\"\n        },\n        \"point\": {\n            \"_attributes\": {\n                \"lat\": \"39.13416667\",\n                \"lon\": \"-121.4375\",\n                \"hae\": \"9999999.0\",\n                \"ce\": \"9999999.0\",\n                \"le\": \"9999999.0\"\n            }\n        },\n        \"detail\": {\n            \"strokeColor\": [\n                {\n                    \"_attributes\": {\n                        \"value\": \"-65536\"\n                    }\n                }\n            ],\n            \"strokeWeight\": [\n                {\n                    \"_attributes\": {\n                        \"value\": \"1.0\"\n                    }\n                }\n            ],\n            \"fillColor\": [\n                {\n                    \"_attributes\": {}\n                }\n            ],\n            \"contact\": [\n                {\n                    \"_attributes\": {\n                        \"callsign\": \"tfr-3-3868\"\n                    }\n                }\n            ],\n            \"remarks\": \"!FDC 3/3868 ZOA CA..AIRSPACE BEALE AFB, CA..TEMPORARY FLIGHT RESTRICTIONS. AUGUST 16-NOVEMBER 5, 2023 LOCAL. PURSUANT TO 49 USC 40103(B)(3), THE FEDERAL AVIATION ADMINISTRATION (FAA) CLASSIFIES THE AIRSPACE DEFINED IN THIS NOTAM AS 'NTL DEFENSE AIRSPACE'. ANY PERSON WHO KNOWINGLY OR WILLFULLY VIOLATES THE RULES CONCERNING OPS IN THIS AIRSPACE MAY BE SUBJECT TO CERTAIN CRIMINAL PENALTIES UNDER 49 USC 40103(B)(3). PILOTS WHO DO NOT ADHERE TO THE FOLLOWING PROC MAY BE INTERCEPTED, DETAINED AND INTERVIEWED BY LAW ENFORCEMENT/SECURITY PERSONNEL. \\nPURSUANT TO 14 CFR 99.7, SPECIAL SECURITY INSTRUCTIONS, ALL ACFT FLT OPS ARE PROHIBITED: WI AN AREA DEFINED AS 10NM RADIUS OF 390803N1212615W (MYV055006.7) 4100FT MSL-FL180 EFFECTIVE 2308162200 UTC (1500 LOCAL 08/16/23) UNTIL 2311050859 UTC (0159 LOCAL 11/05/23). EXC AS SPECIFIED BLW AND/OR UNLESS AUTH BY ATC: 1. ALL AIRCRAFT ENTERING OR EXITING THE TFR MUST BE ON A DISCRETE CODE ASSIGNED BY AN AIR TRAFFIC CONTROL (ATC) FACILITY. 2. AIRCRAFT MUST B...\",\n            \"archive\": \"\",\n            \"labels_on\": [\n                {\n                    \"_attributes\": {\n                        \"value\": \"true\"\n                    }\n                }\n            ],\n            \"precisionlocation\": [\n                {\n                    \"_attributes\": {\n                        \"altsrc\": \"???\"\n                    }\n                }\n            ],\n            \"color\": [\n                {\n                    \"_attributes\": {\n                        \"argb\": \"-65536\"\n                    }\n                }\n            ],\n            \"height\": [\n                {\n                    \"_attributes\": {\n                        \"value\": \"54.864000000000004\"\n                    }\n                }\n            ],\n            \"_geofence\": [\n                {\n                    \"_attributes\": {\n                        \"elevationMonitored\": \"true\",\n                        \"minElevation\": \"0.0\",\n                        \"monitor\": \"All\",\n                        \"trigger\": \"Both\",\n                        \"tracking\": \"false\",\n                        \"maxElevation\": \"54.864000000000004\",\n                        \"boundingSphere\": \"96000.0\"\n                    }\n                }\n            ],\n            \"link\": [\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.30098401,-121.4375\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.29844376,-121.4002184\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.29090073,-121.36407744\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.27858565,-121.33018217\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.26187506,-121.29956756\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.24127959,-121.27316653\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.21742807,-121.25178121\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.19104811,-121.23605861\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.16294355,-121.22647129\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.13396987,-121.22330366\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.1050079,-121.22664414\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.07693711,-121.23638347\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.05060886,-121.25221889\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.0268208,-121.27366425\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.00629284,-121.30006528\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.9896457,-121.33061985\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.97738234,-121.36440231\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.96987307,-121.40039125\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.96734455,-121.4375\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.96987307,-121.47460875\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.97738234,-121.51059769\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.9896457,-121.54438015\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.00629284,-121.57493472\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.0268208,-121.60133575\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.05060886,-121.62278111\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.07693711,-121.63861653\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.1050079,-121.64835586\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.13396987,-121.65169634\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.16294355,-121.64852871\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.19104811,-121.63894139\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.21742807,-121.62321879\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.24127959,-121.60183347\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.26187506,-121.57543244\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.27858565,-121.54481783\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.29090073,-121.51092256\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.29844376,-121.4747816\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.30098401,-121.4375\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"url\": \"https://tfr.faa.gov/save_pages/detail_3_3868.html\",\n                        \"type\": \"\",\n                        \"remarks\": null,\n                        \"relation\": \"r-u\",\n                        \"mime\": \"text/html\",\n                        \"version\": \"1.0\",\n                        \"production_time\": \"\"\n                    }\n                }\n            ]\n        }\n    }\n}\n```",
+    "info": "If `msg.payload` or `env.state` is a 2 letter U.S. abbreviation for a state, this node returns a `msg.payload` as JSON cursor-on-target (CoT) message for use with `node-red-contrib-tak` node and tcp out node.\n\n### INPUT\n\n: payload (string) : contains a 2-letter abbreviation for the desired U.S. state.  If no message or if `msg.payload` is a blank, all TFRs will be downloaded.\n\n### OUTPUTS\n\n1. Standard Output\n: payload (json) : contains a JSON CoT message and should be passed to a `node-red-contrib-tak` node followed by a `tcp out` node with the appropriate network configuration for your set up.  See `node-red-contrib-tak` [documentation](https://node-red-contrib-tak.readthedocs.io/en/latest/) for further details.\n\n2. [TAK Server](https:///tak.gov) DataSync Outputs (Optional)\n: payload (json) :  a json object with the CoT UID sent to the TAK Server in Output #1\n: url (string) :  Contains the http PUSH url using the `.takServerUrl` and `.missionApiPort` (typically `8443`).  It will not send anything if these properties are left blank.\n: header (json) :  Contans the header needed to interact with the TAK Server API.\n: method (string):  `PUT` to pass the cotUid to DataSync to include the CoT message sent out in Output #1.\n\n    4 Messages are pushed if you are sending your CoT messages to a specific DataSync Mission:\n\n    > NOTE that prior to these messages going out, you need to be sending an SA Message along with subscribing to that mission.  You also need an `http request` node properly configured as the recipient of these messages. Please See the `DataSync Subscription` and `http request` node configuration for more.\n\n    > *If any of the properties: `.creatorUid`, `.takServerUrl`, `.takMission` are empty and/or the `.missionApiPort` is not set correctly (it is set to 8443 by default), there will be no message from Output #2.\n\n3. Debug Node (beta) to determine parsing errors.\n\n### DETAILS\n**Example JSON CoT message:**\n```json\n{\n    \"event\": {\n        \"_attributes\": {\n            \"version\": \"2.0\",\n            \"uid\": \"10c46aff-3007-439a-9ee1-fc5ca256395b\",\n            \"type\": \"u-d-f\",\n            \"how\": \"h-e\",\n            \"time\": \"2023-08-15T10:35:21.131Z\",\n            \"start\": \"2023-08-15T10:35:21.131Z\",\n            \"stale\": \"2023-08-15T10:55:21.131Z\"\n        },\n        \"point\": {\n            \"_attributes\": {\n                \"lat\": \"39.13416667\",\n                \"lon\": \"-121.4375\",\n                \"hae\": \"9999999.0\",\n                \"ce\": \"9999999.0\",\n                \"le\": \"9999999.0\"\n            }\n        },\n        \"detail\": {\n            \"strokeColor\": [\n                {\n                    \"_attributes\": {\n                        \"value\": \"-65536\"\n                    }\n                }\n            ],\n            \"strokeWeight\": [\n                {\n                    \"_attributes\": {\n                        \"value\": \"1.0\"\n                    }\n                }\n            ],\n            \"fillColor\": [\n                {\n                    \"_attributes\": {}\n                }\n            ],\n            \"contact\": [\n                {\n                    \"_attributes\": {\n                        \"callsign\": \"tfr-3-3868\"\n                    }\n                }\n            ],\n            \"remarks\": \"!FDC 3/3868 ZOA CA..AIRSPACE BEALE AFB, CA..TEMPORARY FLIGHT RESTRICTIONS. AUGUST 16-NOVEMBER 5, 2023 LOCAL. PURSUANT TO 49 USC 40103(B)(3), THE FEDERAL AVIATION ADMINISTRATION (FAA) CLASSIFIES THE AIRSPACE DEFINED IN THIS NOTAM AS 'NTL DEFENSE AIRSPACE'. ANY PERSON WHO KNOWINGLY OR WILLFULLY VIOLATES THE RULES CONCERNING OPS IN THIS AIRSPACE MAY BE SUBJECT TO CERTAIN CRIMINAL PENALTIES UNDER 49 USC 40103(B)(3). PILOTS WHO DO NOT ADHERE TO THE FOLLOWING PROC MAY BE INTERCEPTED, DETAINED AND INTERVIEWED BY LAW ENFORCEMENT/SECURITY PERSONNEL. \\nPURSUANT TO 14 CFR 99.7, SPECIAL SECURITY INSTRUCTIONS, ALL ACFT FLT OPS ARE PROHIBITED: WI AN AREA DEFINED AS 10NM RADIUS OF 390803N1212615W (MYV055006.7) 4100FT MSL-FL180 EFFECTIVE 2308162200 UTC (1500 LOCAL 08/16/23) UNTIL 2311050859 UTC (0159 LOCAL 11/05/23). EXC AS SPECIFIED BLW AND/OR UNLESS AUTH BY ATC: 1. ALL AIRCRAFT ENTERING OR EXITING THE TFR MUST BE ON A DISCRETE CODE ASSIGNED BY AN AIR TRAFFIC CONTROL (ATC) FACILITY. 2. AIRCRAFT MUST B...\",\n            \"archive\": \"\",\n            \"labels_on\": [\n                {\n                    \"_attributes\": {\n                        \"value\": \"true\"\n                    }\n                }\n            ],\n            \"precisionlocation\": [\n                {\n                    \"_attributes\": {\n                        \"altsrc\": \"???\"\n                    }\n                }\n            ],\n            \"color\": [\n                {\n                    \"_attributes\": {\n                        \"argb\": \"-65536\"\n                    }\n                }\n            ],\n            \"height\": [\n                {\n                    \"_attributes\": {\n                        \"value\": \"54.864000000000004\"\n                    }\n                }\n            ],\n            \"_geofence\": [\n                {\n                    \"_attributes\": {\n                        \"elevationMonitored\": \"true\",\n                        \"minElevation\": \"0.0\",\n                        \"monitor\": \"All\",\n                        \"trigger\": \"Both\",\n                        \"tracking\": \"false\",\n                        \"maxElevation\": \"54.864000000000004\",\n                        \"boundingSphere\": \"96000.0\"\n                    }\n                }\n            ],\n            \"link\": [\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.30098401,-121.4375\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.29844376,-121.4002184\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.29090073,-121.36407744\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.27858565,-121.33018217\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.26187506,-121.29956756\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.24127959,-121.27316653\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.21742807,-121.25178121\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.19104811,-121.23605861\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.16294355,-121.22647129\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.13396987,-121.22330366\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.1050079,-121.22664414\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.07693711,-121.23638347\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.05060886,-121.25221889\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.0268208,-121.27366425\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.00629284,-121.30006528\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.9896457,-121.33061985\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.97738234,-121.36440231\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.96987307,-121.40039125\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.96734455,-121.4375\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.96987307,-121.47460875\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.97738234,-121.51059769\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"38.9896457,-121.54438015\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.00629284,-121.57493472\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.0268208,-121.60133575\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.05060886,-121.62278111\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.07693711,-121.63861653\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.1050079,-121.64835586\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.13396987,-121.65169634\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.16294355,-121.64852871\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.19104811,-121.63894139\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.21742807,-121.62321879\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.24127959,-121.60183347\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.26187506,-121.57543244\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.27858565,-121.54481783\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.29090073,-121.51092256\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.29844376,-121.4747816\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"point\": \"39.30098401,-121.4375\"\n                    }\n                },\n                {\n                    \"_attributes\": {\n                        \"url\": \"https://tfr.faa.gov/save_pages/detail_3_3868.html\",\n                        \"type\": \"\",\n                        \"remarks\": null,\n                        \"relation\": \"r-u\",\n                        \"mime\": \"text/html\",\n                        \"version\": \"1.0\",\n                        \"production_time\": \"\"\n                    }\n                }\n            ]\n        }\n    }\n}\n```\n### References\n 1. [node-red-contrib-tak]():  Documentation for installing `node-red-contrib-tak` node with additional information to configure `tcp out` nodes to pass CoT messages to a [TAK Server](https://tak.gov) or network.\n 2. [Team Awareness Kit](https://tak.gov): To learn more of the Team Awareness Kit (TAK) situational awareness platform.\n",
     "category": "",
     "in": [
         {
@@ -17,8 +17,8 @@
     ],
     "out": [
         {
-            "x": 990,
-            "y": 420,
+            "x": 1020,
+            "y": 480,
             "wires": [
                 {
                     "id": "0acbcc36d9ae2bfb",
@@ -27,8 +27,8 @@
             ]
         },
         {
-            "x": 1760,
-            "y": 420,
+            "x": 1010,
+            "y": 540,
             "wires": [
                 {
                     "id": "67eb11bc5a852888",
@@ -37,12 +37,12 @@
             ]
         },
         {
-            "x": 830,
-            "y": 510,
+            "x": 970,
+            "y": 600,
             "wires": [
                 {
-                    "id": "530f65a6e734f1b4",
-                    "port": 0
+                    "id": "5443ccddda1cbf80",
+                    "port": 1
                 }
             ]
         }
@@ -159,22 +159,22 @@
     "meta": {
         "module": "tfr2cot",
         "type": "parsrer",
-        "version": "1.0.1",
+        "version": "1.1.3",
         "author": "Paul Clifton <paul.clifton@clptak.com>",
         "desc": "If msg.payload or env.state is a 2 letter U.S. abbreviation for a state, this node returns a msg.payload as JSON cursor-on-target (CoT) message for use with node-red-contrib-tak node and tcp out node.",
         "keywords": "tak,atak,itak,tak-server,tfr,faa,cot",
         "license": "Apache-2.0"
     },
-    "color": "#DDAA99",
+    "color": "#C0DEED",
     "inputLabels": [
         "msg.paylaod (string)"
     ],
     "outputLabels": [
         "msg.payload (json)",
         "mission subscription",
-        ""
+        "Debug"
     ],
-    "icon": "nofly.png",
+    "icon": "font-awesome/fa-plane",
     "flow": [
         {
             "id": "816b3b616d151b8e",
@@ -209,26 +209,7 @@
             "y": 180,
             "wires": [
                 [
-                    "d64e2bcaf2644df8"
-                ]
-            ]
-        },
-        {
-            "id": "d64e2bcaf2644df8",
-            "type": "function",
-            "z": "70eb72484ca97dd5",
-            "name": "Clean Up for UI Table",
-            "func": "var lines = msg.payload;\nvar output = [];\nconst url1 = \"https://tfr.faa.gov/save_pages/detail_\";\nconst url2 = \".html\";\nconst regexlocal = /\\//g;\nconst regexdate = /[\\S].*[^\\s]/g;\nconst regexspace = /(\\S)/g;\n\nfor (var i = 0; i < lines.length; i++) {\n    output[i] = {\n        \"date\": lines[i][0], //new Date(lines[\"0\"][i]).toDateString(), \n        \"notam\": lines[i][1].replace(regexlocal,\"_\").trim(),\n        \"notamurl\": url1 + lines[i][1].replace(regexlocal,\"_\") + url2,\n        \"ctrr\": lines[i][2],\n        \"st\": lines[i][3], \n        \"rsn\": lines[i][4], \n        \"loc\": lines[i][5], \n    };\n}\nvar tfrList = [];\nfor (var j = 0; j < output.length; j++) {\n    tfrList[j] = output[j].notamurl.replace(\"html\",\"xml\");\n}\nif (tfrList.length == 0) {\n    msg.topic = \"noTFRs\";\n} else {\n    msg.topic = \"tfr\";\n}\nmsg.tfr_list = tfrList;\nmsg.payload = output;\nreturn msg;",
-            "outputs": 1,
-            "noerr": 0,
-            "initialize": "",
-            "finalize": "",
-            "libs": [],
-            "x": 280,
-            "y": 240,
-            "wires": [
-                [
-                    "58dfa8bd564812d3"
+                    "5243e1ffb07932e7"
                 ]
             ]
         },
@@ -237,8 +218,9 @@
             "type": "function",
             "z": "70eb72484ca97dd5",
             "name": "Split TFR Array",
-            "func": "for (var i = 0; i < msg.tfr_list.length; i++) {\n    var newMsg = {};\n    newMsg.url = msg.tfr_list[i];\n    newMsg.method = \"GET\"\n    node.send(newMsg);\n}\nreturn null;",
+            "func": "for (var i = 0; i < msg.tfr_list.length; i++) {\n    var newMsg = {};\n    newMsg.url = msg.tfr_list[i].replace(\"html\",\"xml\");\n    newMsg.method = \"GET\"\n    node.send(newMsg);\n}\nreturn null;",
             "outputs": 1,
+            "timeout": "",
             "noerr": 0,
             "initialize": "",
             "finalize": "",
@@ -347,6 +329,7 @@
             "name": "JSON to PLI CoT ",
             "func": "var payload = msg.payload;\nvar uid = payload.uid;\nvar lat = payload.lat;\nvar lon = payload.lon;\nvar altitude = payload.altitude;\n\nvar how = payload.how;\nvar type = payload.type;\nvar detail = payload.detail\nvar stale = \"\";\n\nif (payload.stale){\n    stale = payload.stale;\n} else {\n    const cinco = 10 * 60 * 1000;\n    stale = new Date(Date.now() + 2 * cinco).toISOString();\n};\n\nif (uid != null) {\n    if (lat != null) {\n        if (lon != null) {\n            let newpayload = {\n                \"event\": {\n                    \"_attributes\": {\n                        \"version\": \"2.0\",\n                        \"uid\": uid,\n                        \"type\": type,\n                        \"how\": how,\n                        \"time\": new Date(Date.now()).toISOString(),\n                        \"start\": new Date(Date.now()).toISOString(),\n                        \"stale\": stale,\n                    },\n                    \"point\": {\n                        \"_attributes\": {\n                            \"lat\": JSON.stringify(lat),\n                            \"lon\": JSON.stringify(lon),\n                            \"hae\": \"9999999.0\",\n                            \"ce\": \"9999999.0\",\n                            \"le\": \"9999999.0\",\n                        }\n                    },\n                    \"detail\": {\n                    }\n                }\n            }\n            msg.payload = newpayload;\n            msg.cot_detail = detail\n            msg.topic = how;\n            msg.type = type;\n            return msg;\n        } else {\n            msg.topic = \"unknown\"\n            return msg;\n        }\n    }\n} else {\n    msg.topic = \"incomplete\"\n    return msg;\n}",
             "outputs": 1,
+            "timeout": "",
             "noerr": 0,
             "initialize": "",
             "finalize": "",
@@ -373,6 +356,7 @@
             "name": "cot_detail_freeforrm_polygon",
             "func": "/*\n    Example JSON containing the keys and values for popular cursor on target CoT\nfields, including time, point latitude & longitude, type, and more.\n* /\n\n/* Stale is Date.now() + milliseconds\n Ruberic: 1000 Milliseconds in 1 Second\n Example:  5 minutes, in milliseconds, is 300000\n   (5 x 60 * 1000)\n*/\n\nconst cinco = 5 * 60 * 1000;\nconst diez = 2 * cinco;\nvar stale = new Date(Date.now() + diez).toISOString();\n\nconst destination = msg.destination;\nconst detail = msg.cot_detail\nconst cot_base = msg.payload\nvar new_cot = cot_base;\nvar cot_status = [\n    {\n        \"_attributes\": {\n            \"readiness\":\"true\"\n        }\n    }\n];\nnew_cot.event.detail.status = cot_status;\nvar strokeColor = [\n    {\n        \"_attributes\": {\n            \"value\": \"\"\n        }\n    }\n];\nnew_cot.event.detail.strokeColor = strokeColor;\nif (detail.shape.strokecolor !== null && detail.shape.strokecolor !== \"\") {\n    new_cot.event.detail.strokeColor[0]._attributes.value = detail.shape.strokecolor;\n} else {\n    new_cot.event.detail.strokeColor[0]._attributes.value = \"-65536\"\n};\nvar strokeWeight = [\n    {\n        \"_attributes\": {\n            \"value\": \"2.0\"\n        }\n    }\n    ];\nnew_cot.event.detail.strokeWeight = strokeWeight;\nif (detail.shape.strokeweight !== null && detail.shape.strokeweight !== \"\"){\n    new_cot.event.detail.strokeWeight[0]._attributes.value = detail.shape.strokeweight;\n} else {\n    new_cot.event.detail.strokeWeight[0]._attributes.value = \"2.0\"\n};\nvar fillColor = [\n    {\n        \"_attributes\": {\n        \"value\": \"\"\n        }\n    }\n];\nnew_cot.event.detail.fillColor = fillColor;\nif (detail.shape.fillcolor !== null && detail.shape.fillcolor !== \"\") {\n    new_cot.event.detail.fillColor[0]._attributes.value = detail.shape.fillcolor;\n} else {};\n\nvar contact = [\n    {\n        \"_attributes\": {\n            \"callsign\": \"\"\n        }\n    }\n];\nnew_cot.event.detail.contact = contact;\nif (detail.callsign !== null && detail.callsign !== \"\") {\n    new_cot.event.detail.contact[0]._attributes.callsign = detail.callsign;\n} else {\n    new_cot.event.detail.contact[0]._attributes.callsign = new_cot.event._attributes.uid;\n};\n\nvar remarks = \"\";\nnew_cot.event.detail.remarks = remarks;\nif (detail.remarks !== null) {\n    new_cot.event.detail.remarks = detail.remarks\n};\n    \nvar archive= \"\";\nnew_cot.event.detail.archive = archive;\n\nvar labels_on = [\n    {\n        \"_attributes\": {\n            \"value\": \"true\"\n        }\n    }\n];\nnew_cot.event.detail.labels_on = labels_on;\nif (detail.labels_on !== null && detail.labels_on === \"true\") {\n    new_cot.event.detail.labels_on._attributes.value = \"true\"\n};\nvar precisionlocation = [\n    {\n        \"_attributes\": {\n            \"altsrc\": \"???\"\n        }\n    }\n];\nnew_cot.event.detail.precisionlocation = precisionlocation;\nvar color = [\n    {\n        \"_attributes\": {\n            \"argb\": \"-65536\"\n        }\n    }\n];\nnew_cot.event.detail.color = color;\nif (detail.shape.color !== null && detail.shape.color !== \"\") {\n    new_cot.event.detail.color[0]._attributes.argb = detail.shape.color;\n};\nvar height_attrib = [\n    {\n        \"_attributes\": {\n            \"value\": \"0.0\"\n        }\n    }\n];\n\nnew_cot.event.detail.height = height_attrib;\nif (detail.height !== null && detail.height !== undefined && detail.height !== \"\") {\n    var height = detail.height;\n    new_cot.event.detail.height[0]._attributes.value = JSON.stringify(height);\n};\nvar geofence_attrib = [\n    {\n        \"_attributes\": {\n            \"elevationMonitored\": \"true\",\n            \"minElevation\": \"0.0\",\n            \"monitor\": \"All\",\n            \"trigger\": \"Both\",\n            \"tracking\": \"false\",\n            \"maxElevation\":\"12500\",\n            \"boundingSphere\":\"96000.0\"\n        }\n    }\n];\nnew_cot.event.detail._geofence = geofence_attrib;\nif (height !== undefined && height !== null && height !== \"\"){\n    new_cot.event.detail._geofence[0]._attributes.maxElevation = JSON.stringify(height);\n};\n\nmsg.payload = new_cot;\nmsg.cot_detail = detail;\nreturn msg;",
             "outputs": 1,
+            "timeout": "",
             "noerr": 0,
             "initialize": "",
             "finalize": "",
@@ -423,8 +407,8 @@
             "initialize": "",
             "finalize": "",
             "libs": [],
-            "x": 700,
-            "y": 420,
+            "x": 550,
+            "y": 450,
             "wires": [
                 [
                     "0acbcc36d9ae2bfb"
@@ -438,6 +422,7 @@
             "name": "Check State",
             "func": "const payload = msg.payload.trim();\n\n//Verify payload is a valid US State\nvar states = [\"AL\", \"AK\", \"AZ\", \"AR\", \"CA\", \"CO\", \"CT\", \"DE\", \"FL\", \"GA\", \"HI\", \"ID\", \"IL\", \"IN\", \"IA\", \"KS\", \"KY\", \"LA\", \"ME\", \"MD\", \"MA\", \"MI\", \"MN\", \"MS\", \"MO\", \"MT\", \"NE\", \"NV\", \"NH\", \"NJ\", \"NM\", \"NY\", \"NC\", \"ND\", \"OH\", \"OK\", \"OR\", \"PA\", \"RI\", \"SC\", \"SD\", \"TN\", \"TX\", \"UT\", \"VT\", \"VA\", \"WA\", \"WV\", \"WI\", \"WY\"];\n\n//URL if no state provided - downloads ALL TFRs\nconst noStateUrl = \"https://tfr.faa.gov/tfr2/list.jsp?type=all&sort=d&up=Y\";\n\nvar isState = states.includes(msg.payload.toUpperCase()); \nvar default_state = env.get(\"default_state\")\nif (payload !== undefined && payload !== null && payload !== \"\") {\n    var isState = states.includes(msg.payload.toUpperCase());\n    if (isState === true) {\n        var state = msg.payload.toUpperCase();\n        msg.url = 'https://tfr.faa.gov/tfr2/list.jsp?p=list&state='+state+'&type=all&sort=d&up=N';\n        return msg;\n    } else if (default_state !== undefined && default_state !== null && default_state !== \"\") {\n        state = default_state.toUpperCase();\n        msg.url = 'https://tfr.faa.gov/tfr2/list.jsp?p=list&state=' + state + '&type=all&sort=d&up=N';\n        return msg;\n    }\n} else if (default_state !== undefined && default_state !== null && default_state !== \"\") {\n    state = default_state.toUpperCase();\n    msg.url = 'https://tfr.faa.gov/tfr2/list.jsp?p=list&state=' + state + '&type=all&sort=d&up=N';\n    msg.method = \"GET\"\n    return msg;\n} else {\n    msg.url = noStateUrl;\n    return msg;\n};",
             "outputs": 1,
+            "timeout": "",
             "noerr": 0,
             "initialize": "",
             "finalize": "",
@@ -546,8 +531,8 @@
             "from": "",
             "to": "",
             "reg": false,
-            "x": 720,
-            "y": 360,
+            "x": 750,
+            "y": 390,
             "wires": [
                 [
                     "7ed561833cabfe74"
@@ -623,8 +608,8 @@
             "initialize": "",
             "finalize": "",
             "libs": [],
-            "x": 500,
-            "y": 360,
+            "x": 530,
+            "y": 390,
             "wires": [
                 [
                     "276aa81df27e53c1"
@@ -649,8 +634,8 @@
             "checkall": "true",
             "repair": false,
             "outputs": 2,
-            "x": 1120,
-            "y": 360,
+            "x": 1130,
+            "y": 390,
             "wires": [
                 [],
                 [
@@ -669,8 +654,8 @@
             "initialize": "",
             "finalize": "",
             "libs": [],
-            "x": 1760,
-            "y": 360,
+            "x": 1660,
+            "y": 390,
             "wires": [
                 []
             ]
@@ -686,8 +671,8 @@
             "initialize": "",
             "finalize": "",
             "libs": [],
-            "x": 940,
-            "y": 360,
+            "x": 950,
+            "y": 390,
             "wires": [
                 [
                     "df8b6778d5ff8bfe"
@@ -731,8 +716,8 @@
             "checkall": "true",
             "repair": false,
             "outputs": 2,
-            "x": 230,
-            "y": 360,
+            "x": 260,
+            "y": 390,
             "wires": [
                 [
                     "e614f91fceb0d546"
@@ -753,8 +738,8 @@
             "initialize": "",
             "finalize": "",
             "libs": [],
-            "x": 1380,
-            "y": 360,
+            "x": 1290,
+            "y": 390,
             "wires": [
                 [
                     "22e0e43169d529a0"
@@ -776,8 +761,8 @@
             "checkall": "true",
             "repair": false,
             "outputs": 1,
-            "x": 1550,
-            "y": 360,
+            "x": 1460,
+            "y": 390,
             "wires": [
                 [
                     "67eb11bc5a852888"
@@ -808,38 +793,28 @@
                 [
                     "8f75d304e5f11f38"
                 ],
-                [
-                    "60e77e5c8bfee7bc"
-                ]
-            ]
-        },
-        {
-            "id": "530f65a6e734f1b4",
-            "type": "link in",
-            "z": "70eb72484ca97dd5",
-            "name": "Debug Out",
-            "links": [
-                "60e77e5c8bfee7bc",
-                "616ac87135e789f9"
-            ],
-            "x": 765,
-            "y": 510,
-            "wires": [
                 []
             ]
         },
         {
-            "id": "60e77e5c8bfee7bc",
-            "type": "link out",
+            "id": "5243e1ffb07932e7",
+            "type": "function",
             "z": "70eb72484ca97dd5",
-            "name": "Debug",
-            "mode": "link",
-            "links": [
-                "530f65a6e734f1b4"
-            ],
-            "x": 585,
-            "y": 300,
-            "wires": []
+            "name": "Clean Up for UI Table",
+            "func": "var lines = msg.payload;\nvar output = [];\nconst url1 = \"https://tfr.faa.gov/save_pages/detail_\";\nconst url2 = \".html\";\nconst regexlocal = /\\//g;\nconst regexdate = /[\\S].*[^\\s]/g;\nconst regexdate2 = /\\d{2}\\/\\d{2}\\/\\d{4}/g;\nconst regexspace = /(\\S)/g;\nconst regexTFR = /\\d\\/\\d{4,}/g;\n\nfor (var i = 0; i < lines.length; i++) {\n    if (lines[i][0].match(regexdate2) && lines[i][1].match(regexTFR)) {\n        output[i] = {\n        \"   date\": lines[i][0], //new Date(lines[\"0\"][i]).toDateString(), \n            \"notam\": lines[i][1].replace(regexlocal,\"_\").trim(),\n            \"notamurl\": url1 + lines[i][1].replace(regexlocal,\"_\") + url2,\n            \"ctrr\": lines[i][2],\n            \"st\": lines[i][3], \n            \"rsn\": lines[i][4], \n            \"loc\": lines[i][5], \n        };\n    } else {\n        output[i] = null;\n    }\n}\n\nvar filteredArray = output.filter(function(value) {\n    return value !== null;\n});\n\nvar tfrList = [];\nfor (var j = 0; j < filteredArray.length; j++) {\n    if (filteredArray[i] !== null) {\n        tfrList[j] = filteredArray[j].notamurl;//.replace(\"html\",\"xml\");\n    }\n    if (tfrList.length == 0) {\n        msg.topic = \"noTFRs\";\n    } else {\n        msg.topic = \"tfr\";\n    }\n}\nmsg.tfr_list = tfrList;\nmsg.payload = output;\nreturn msg;",
+            "outputs": 1,
+            "timeout": "",
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [],
+            "x": 280,
+            "y": 240,
+            "wires": [
+                [
+                    "58dfa8bd564812d3"
+                ]
+            ]
         }
     ]
 }
