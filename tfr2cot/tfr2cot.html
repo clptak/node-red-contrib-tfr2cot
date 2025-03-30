@@ -29,8 +29,8 @@ limitations under the License.
         },
         inputs:1,
         outputs:1,
-        icon: "plane.png",
-        inputLabels: "msg.payload as a 2 letter string",
+        icon: "nofly.png",
+        inputLabels: "msg.payload as a json-formatted array of 2 letter text strings",
         outputLabels: ["CoT JSON"],
         label: function() {
             return this.name||"tfr2cot";
@@ -85,7 +85,7 @@ The `default_state` field is the default state if you set an `inject` node to re
 If `msg.payload` or `env.state` is a 2 letter U.S. abbreviation for a state, this node returns a `msg.payload` as JSON cursor-on-target (CoT) message for use with `node-red-contrib-tak` node and tcp out node.
 
 ### INPUT
-: payload (string) : contains a 2-letter abbreviation for the desired U.S. state.  If no message or if `msg.payload` is a blank, all TFRs will be downloaded.
+: payload (string) : contains a json-formatted array of 2-letter abbreviation for the desired U.S. state (text strings).  If no message or if `msg.payload` is a blank, all TFRs will be downloaded.
 
 ### OUTPUTS
 1. Standard Output
